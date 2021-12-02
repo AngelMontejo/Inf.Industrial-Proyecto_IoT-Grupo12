@@ -1,1 +1,1 @@
-# Informatica-Industrial-Proyecto-IoT
+# Informatica Industrial: Proyecto IoT
