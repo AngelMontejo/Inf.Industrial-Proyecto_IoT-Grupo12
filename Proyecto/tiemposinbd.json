@@ -1,0 +1,308 @@
+[
+    {
+        "id": "c81fdfe028df9dee",
+        "type": "tab",
+        "label": "Forecast",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1fb413047a5a9d68",
+        "type": "xml",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 630,
+        "y": 260,
+        "wires": [
+            [
+                "2ae7a54cefc5701c",
+                "e85efcda4864438e"
+            ]
+        ]
+    },
+    {
+        "id": "2ae7a54cefc5701c",
+        "type": "debug",
+        "z": "c81fdfe028df9dee",
+        "name": "whole xml",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 820,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "b501bb738dbf90df",
+        "type": "telegram command",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "command": "/tiempo",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b264e675eeec73a9",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 70,
+        "y": 300,
+        "wires": [
+            [
+                "060b5c901f0dd019"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e85efcda4864438e",
+        "type": "function",
+        "z": "c81fdfe028df9dee",
+        "name": "Obtener datos",
+        "func": "var fecha = new Date();\nfecha = fecha.toLocaleString(\"es-ES\",{\"timeZone\":\"Europe/Madrid\"});\nmsg.payload.fecha=fecha;\nvar hora = parseInt(fecha.slice(-8,-6));\nif (hora>=0 && hora<6) {\nmsg.payload.intervalo=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[4].$.periodo;\nmsg.payload.PropLluviaHoy=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[4]._;\nmsg.payload.EstHoy=msg.payload.root.prediccion[0].dia[0].estado_cielo[4].$.descripcion;\n}\nelse if (hora>=6 && hora<12) {\nmsg.payload.intervalo=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[5].$.periodo;\nmsg.payload.PropLluviaHoy=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[5]._;\nmsg.payload.EstHoy=msg.payload.root.prediccion[0].dia[0].estado_cielo[5].$.descripcion;\n}\nelse if (hora>=12 && hora<18) {\nmsg.payload.intervalo=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[6].$.periodo;\nmsg.payload.PropLluviaHoy=msg.payload.root.prediccion[0].dia[0].prob_precipitacion[6]._;\nmsg.payload.EstHoy=msg.payload.root.prediccion[0].dia[0].estado_cielo[6].$.descripcion;\n}\nelse if (hora>=18 && hora<24) {\nmsg.payload.intervalo=msg.payload.root.prediccion[0].dia[1].prob_precipitacion[3].$.periodo;\nmsg.payload.PropLluviaHoy=msg.payload.root.prediccion[0].dia[1].prob_precipitacion[3]._;\nmsg.payload.EstHoy=msg.payload.root.prediccion[0].dia[1].estado_cielo[3].$.descripcion;\n}\n\nmsg.payload.PropLluviaTmrr=msg.payload.root.prediccion[0].dia[1].prob_precipitacion[0]._;\nmsg.payload.EstTmrr=msg.payload.root.prediccion[0].dia[1].estado_cielo[0].$.descripcion;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 340,
+        "wires": [
+            [
+                "941db96735292bd2",
+                "2e96b7a12263419f"
+            ]
+        ]
+    },
+    {
+        "id": "941db96735292bd2",
+        "type": "debug",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "060b5c901f0dd019",
+        "type": "function",
+        "z": "c81fdfe028df9dee",
+        "name": "ultimo registro",
+        "func": "msg.mensaje=msg.payload;\nmsg.payload={};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 240,
+        "wires": [
+            [
+                "4b3423b57847284f"
+            ]
+        ]
+    },
+    {
+        "id": "1aa025458010f5e2",
+        "type": "function",
+        "z": "c81fdfe028df9dee",
+        "name": "mensaje bienvenida",
+        "func": "if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \" +msg.originalMessage.from.first_name+  \", soy el bot de Informática Industrial. Puedo responderte a estos comandos:\\n/start\\n/tiempo\";\n return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 280,
+        "wires": [
+            [
+                "55c1d0529fb10602",
+                "43683ea9c95f48e4"
+            ]
+        ]
+    },
+    {
+        "id": "2e96b7a12263419f",
+        "type": "function",
+        "z": "c81fdfe028df9dee",
+        "name": "mensaje respuesta",
+        "func": "var intervalo=msg.payload.intervalo;\nvar PropLluviaHoy=msg.payload.PropLluviaHoy;\nvar Est_Hoy=msg.payload.EstHoy;\nvar PropLluviaTmrr=msg.payload.PropLluviaTmrr;\nvar Est_Tmrr=msg.payload.EstTmrr;\nvar fecha=msg.payload.fecha;\nmsg.payload=msg.mensaje;\n\nmsg.payload.content=\"Según la AEMET la predicción para las próximas horas (\"+intervalo+\") es de cielo \"+Est_Hoy+\" y probabilidad de lluvia de \"+PropLluviaHoy+\"%. Mañana la previsión es de cielo \"+Est_Tmrr+\" y probabilidad de lluvia de \"+PropLluviaTmrr+\"%.\\nPredicción elaborada: \"+fecha;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1190,
+        "y": 400,
+        "wires": [
+            [
+                "0663403b64ec6160",
+                "55c1d0529fb10602"
+            ]
+        ]
+    },
+    {
+        "id": "0663403b64ec6160",
+        "type": "debug",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "84dc682238fe70a2",
+        "type": "telegram receiver",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "bot": "b264e675eeec73a9",
+        "saveDataDir": "",
+        "filterCommands": true,
+        "x": 1030.2074127197266,
+        "y": 194.85228729248047,
+        "wires": [
+            [
+                "1aa025458010f5e2",
+                "7d5a85d6e8a7baca"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "af29e1b727b291c3",
+        "type": "telegram command",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "command": "/start",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b264e675eeec73a9",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 990.2074127197266,
+        "y": 294.85228729248047,
+        "wires": [
+            [
+                "1aa025458010f5e2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "55c1d0529fb10602",
+        "type": "telegram sender",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "bot": "b264e675eeec73a9",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1750,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "43683ea9c95f48e4",
+        "type": "debug",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1550.2074127197266,
+        "y": 154.85228729248047,
+        "wires": []
+    },
+    {
+        "id": "7d5a85d6e8a7baca",
+        "type": "debug",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1230.2074127197266,
+        "y": 174.85228729248047,
+        "wires": []
+    },
+    {
+        "id": "4b3423b57847284f",
+        "type": "www-request",
+        "z": "c81fdfe028df9dee",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://www.aemet.es/xml/municipios/localidad_29067.xml",
+        "follow-redirects": true,
+        "persistent-http": true,
+        "tls": "",
+        "x": 430,
+        "y": 300,
+        "wires": [
+            [
+                "1fb413047a5a9d68"
+            ]
+        ]
+    },
+    {
+        "id": "b264e675eeec73a9",
+        "type": "telegram bot",
+        "botname": "Tiempo_Inf_Ind_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    }
+]
