@@ -4,8 +4,9 @@
 #include <ArduinoJson.h>
 #include <ESP8266httpUpdate.h>
 
+//--------------DEFINICION VARIABLES--------------------------
 //Datos para actualización OTA:
-#define HTTP_OTA_ADDRESS      F(Wifi.localIP().toString().c_str())    // Address of OTA update server
+#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
 #define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
 #define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
 #define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
@@ -17,9 +18,22 @@ void inicio_OTA();
 void error_OTA(int);
 
 
-//Datos sensor
+//Datos sensor y estructura de datos
 DHTesp dht;           // Objeto sensor
 ADC_MODE(ADC_VCC);    // Función para poder medir la alimentación de la placa.
+
+struct registro_datos {   //Definimos una estructura de datos para guardar todos los datos que queremos enviar
+  unsigned long tiempo;   
+  float temp;
+  float hum;
+  float bateria;
+  int valor_led;
+  bool valor_switch;
+  char chipid[16];
+  char* SSId;
+  int32_t rssi;
+  IPAddress ip;
+};
 
 
 // GPIOs y variables  
@@ -29,6 +43,7 @@ int LED_OTA = 2;      //Pin del LED usado durante la actualización FOTA
 int SENSOR = 5;       //Pin de datos del sensor
 
 char ID_PLACA[16];        // Cadenas para ID de la placa
+int PWM_led;              // Variable que controla intensidad del LED1.
 int status_led;           // Variable que indica estado del LED2
 int status_anterior=-1;   // Variable que vamos a usar después para comparar el valor actual con el anterior.
 
@@ -37,9 +52,20 @@ int status_anterior=-1;   // Variable que vamos a usar después para comparar el
 const char* ssid = "infind";                // Usuario del punto de acceso.
 const char* password = "1518wifi";          // Contraseña del punto de acceso.
 const char* mqtt_server = "172.16.53.138";  // IP del equipo.
+
+
+//Definimos el mensaje que se va a enviar:
+  #define MSG_BUFFER_SIZE  (256)  // "#define" permite asignarle un nombre a una constante.
+  char msg[MSG_BUFFER_SIZE];      // Mensaje que se muestra por el puerto serie.
+  char msg_json[MSG_BUFFER_SIZE]; // Mensaje que se manda al broker MQTT.
+  unsigned long lastMsg = 0;      // Tiempo en el que se envió el último mensaje.
+
+
 // Creamos un cliente MQTT denominado "espClient".
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+
 
 //----------------FOTA-----------------------
 void intenta_OTA()
@@ -67,7 +93,7 @@ void intenta_OTA()
     }
 }
 
-//-----------------------------------------------------
+//----------------FUNCIONES FOTA-------------------------------------
 void final_OTA()
 {
   Serial.println("Fin OTA. Reiniciando...");
@@ -161,9 +187,98 @@ void reconnect() {
   }
 }
 
-//----------------------SETUP-------------------------------
+//-------------------PROCESAR MENSAJES----------------------------
+void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
+  
+  char* mensaje = (char*)malloc(length+1);  // reservo memoria para copia del mensaje
+  strncpy(mensaje, (char*)payload, length); // copio el mensaje en cadena de caracteres
+  mensaje[length]='\0';                     // caracter cero marca el final de la cadena
+
+  
+  int valor_anterior=-1;   // Variable que vamos a usar después para comparar el valor actual con el anterior.
+        
+
+  // Mostramos por pantalla el topic recibido.
+  Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
+  
+  // Compara si el mensaje que llega es del mismo topic que el indicado.
+  if(strcmp(topic, "infind/GRUPO12/led/cmd")==0) 
+  {
+    StaticJsonDocument<32> root; // el tamaño del buffer tiene que ser el adecuado
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(root, mensaje,length);
+
+    // Compruebo si no hubo error
+    if (error) {
+      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
+      Serial.println(error.c_str());
+    }
+    
+    else
+      if(root.containsKey("level"))  // comprobar si existe el campo/clave que estamos buscando
+      { 
+        PWM_led = root["level"];    // Lo que hay en el campo "level" del payload se guarda en la variable "valor_led".
+        Serial.print("Mensaje OK, nivel de intensidad = ");
+        Serial.println(PWM_led);
+
+        int PWM = 255 - PWM_led*(255/100);    // Pasamos de escala 100-0 a 255-0.
+                                                // A 255 le restamos "valor_led*(255/100)" para darle la vuelta a la escala.
+                                                // Es así porque el LED está encendido a nivel lógico bajo (0) y se apaga a nivel lógico alto (1).
+        
+        analogWrite(LED2,PWM);    // Escribimos en el LED2 el valor de PWM.
+
+        // Cuando cambie el valor de la intensidad del led, enviamos un mensaje.
+        if(PWM_led != valor_anterior)
+        {
+          // Información del LED
+          snprintf (msg, MSG_BUFFER_SIZE, "{\"LED\": %d}", PWM_led);
+          Serial.print("Mensaje de confirmación de intensidad: ");
+          Serial.println(msg);
+          client.publish("infind/GRUPO12/led/status", msg);
+
+          valor_anterior = PWM_led;
+        }
+      }
+      else
+      {
+        Serial.print("Error : ");
+        Serial.println("\"level\" key not found in JSON");
+      }
+    }
+    
+  else
+  {
+    Serial.println("Error: Topic desconocido");
+  }
+
+  free(mensaje);    // Para liberar memoria.
+}
+
+//-------------SERIALIZA JSON----------------
+      
+char serializa_JSON (char* payload)
+{
+  StaticJsonDocument<300> jsonRoot;
+  char jsonString;
+ 
+  jsonRoot= payload;
+  
+  serializeJson(jsonRoot,jsonString);
+  return jsonString;
+}
+
+//-------------SERIALIZA SPRINTF-------------------------------
+
+void serializa_sprintf(struct registro_datos datos, char *cadena, int size)
+{
+  snprintf(cadena,size,"{\"CHIPID\":%s\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
+                        datos.chipid, datos.tiempo, datos.bateria, datos.temp, datos.hum, datos.valor_led, datos.valor_switch, datos.SSId, datos.ip.toString().c_str(), datos.rssi);
+}
+
+//-----------------SETUP-------------------------------
 
 void setup() {
+  
   pinMode(LED1, OUTPUT);      // Definimos el pin LED1 como un Output. Tambien se corresponde con LED_OTA
   pinMode(LED2, OUTPUT);      // Definimos el pin LED" como un Output
 
@@ -189,36 +304,47 @@ void setup() {
 
 void loop() {
 
+  // Definimos la estructura de datos del tipo registro_datos
+  struct registro_datos misdatos;        
+    
   // Si el cliente se desconecta, llamamos a a la función de reconectar.
   if (!client.connected()) {
     reconnect();
   }
   client.loop();
 
-  // Guardamos en una variable el tiempo actual en ms
-  unsigned long now = millis();
+  // Guardamos en el campo 'tiempo' el tiempo actual en ms
+  misdatos.tiempo = millis();
 
-  // Como queremos actualizar los datos cada 10ms, lo ponemos de condición del if.
-  if (now - lastMsg > 30000) {
-    lastMsg = now;  // Actualizamos cuando se recibió el último mensaje.
+  // Como queremos actualizar los datos cada 30 s, lo ponemos de condición del if.
+  if (misdatos.tiempo - lastMsg > 30000) {
+    lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
 
-    // Actualizamos el valor de los sensores y de la batería.
-    float hum = dht.getHumidity();         // Datos de humedad.
-    float temp = dht.getTemperature();     // Datos de temperatura.
-    float bateria = ESP.getVcc();          // Medimos la alimentación de la placa.
+    // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
+    sprintf( misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
+    misdatos.hum = dht.getHumidity();         // Datos de humedad.
+    misdatos.temp = dht.getTemperature();     // Datos de temperatura.
+    misdatos.bateria = ESP.getVcc();          // Medimos la alimentación de la placa.
 
     // Actualizamos datos de conexión.
-    int32_t rssi = WiFi.RSSI();            // Datos de conexión de wifi.
-    IPAddress ip = WiFi.localIP();         // Datos de dirección IP (convertidos a tipo string).
+    sprintf( misdatos.SSId, ssid);           // Datos del ssid.
+    misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
+    misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
 
-    // Conformamos el mensaje con los datos del sensor
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}", now, bateria, temp, hum, valor_led, ssid, ip.toString().c_str(), rssi);
+    // Actualizamos valores de los leds 
+    misdatos.valor_led = PWM_led;
+    misdatos.valor_switch = status_led;
+    
+    // Generamos el mensaje:
+    serializa_sprintf(misdatos, msg, MSG_BUFFER_SIZE);
 
-    //Serializamos:
-   
-    snprintf (msg_json, MSG_BUFFER_SIZE,serializa_JSON(msg));
+    // Generamos el mensaje en JSON:
+    Serial.println(serializa_JSON(msg));
+    
+    //snprintf (msg_json, MSG_BUFFER_SIZE,serializa_JSON(msg));
     Serial.print("Datos: ");
-    Serial.println(msg_json);
+    Serial.println(msg);
+    
     client.publish("infind/GRUPO12/datos", msg_json);   
   }
 
