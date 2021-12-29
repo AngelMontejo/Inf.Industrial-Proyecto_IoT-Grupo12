@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include "DHTesp.h"
-#include <ArduinoJson.h>
 #include <ESP8266httpUpdate.h>
+#include <ArduinoJson.h>
 
 //--------------DEFINICION VARIABLES--------------------------
 //Datos para actualización OTA:
@@ -23,17 +23,17 @@ unsigned long lastAct=0;
 DHTesp dht;           // Objeto sensor
 ADC_MODE(ADC_VCC);    // Función para poder medir la alimentación de la placa.
 
-struct registro_datos {   //Definimos una estructura de datos para guardar todos los datos que queremos enviar
-  unsigned long tiempo;   
-  float temp;
-  float hum;
-  float bateria;
-  int valor_led;
-  bool valor_switch;
-  char chipid[16];
-  char* SSId;
-  int32_t rssi;
-  IPAddress ip;
+struct registro_datos    //Definimos una estructura de datos para guardar todos los datos que queremos enviar
+     {unsigned long tiempo;   
+      float temp;
+      float hum;
+      float bateria;
+      int valor_led;
+      bool valor_switch;
+      char chipid[16];
+      char* SSId;
+      int32_t rssi;
+      IPAddress ip;
 };
 
 
@@ -45,9 +45,7 @@ int SENSOR = 5;       //Pin de datos del sensor
 
 //Variables de led:
 char ID_PLACA[16];        // Cadenas para ID de la placa
-int PWM_led;              // Variable que controla intensidad del LED1.
-bool Switch_led;
-int PWM_status;           //Variable que indica estado del LED1
+int PWM_status;           // Variable que indica estado del LED1
 int Switch_status;        // Variable que indica estado del LED2
 
 //Variables de configuración
@@ -55,26 +53,36 @@ int vel_envio=30000;
 int vel_fota;
 int vel_PWM;
 int LED_logica=0;
-int SWITHC_logica=0;
+int SWITCH_logica=0;
 
-//Datos para conectar a WIFI
+// Datos para conectar a WIFI
 const char* ssid = "infind";                // Usuario del punto de acceso.
 const char* password = "1518wifi";          // Contraseña del punto de acceso.
 const char* mqtt_server = "172.16.53.138";  // IP del equipo.
 
 
-//Definimos el mensaje que se va a enviar:
-  #define MSG_BUFFER_SIZE  (256)  // "#define" permite asignarle un nombre a una constante.
-  char msg[MSG_BUFFER_SIZE];      // Mensaje que se muestra por el puerto serie.
-  char msg_json[MSG_BUFFER_SIZE]; // Mensaje que se manda al broker MQTT.
-  unsigned long lastMsg = 0;      // Tiempo en el que se envió el último mensaje.
+// Definimos los mensajes que se van a publicar:
+#define MSG_BUFFER_SIZE  (256)  // "#define" permite asignarle un nombre a una constante.
+char msg_datos[MSG_BUFFER_SIZE];      // Mensaje de datos
+char msg_on[MSG_BUFFER_SIZE];   // Mensaje de conexion activa
+char msg_off[MSG_BUFFER_SIZE];  // Mensaje de conexion inactiva
+char msg_led[MSG_BUFFER_SIZE];  // Mensaje con estado del LED1 y LED2
+unsigned long lastMsg = 0;      // Tiempo en el que se envió el último mensaje de datos
 
 
 // Creamos un cliente MQTT denominado "espClient".
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-
+// Definimos los topics:
+  char* topic_conexion;
+  char* topic_datos;
+  char* topic_config;
+  char* topic_led_cmd;
+  char* topic_led_status;
+  char* topic_switch_cmd;
+  char* topic_switch_status;
+  
 
 //----------------FOTA-----------------------
 void intenta_OTA()
@@ -172,22 +180,26 @@ void reconnect() {
     String clientId = "ESP8266Client-";
     clientId += String(ID_PLACA);
     
+    // Definimos los mensajes de conexion y desconexion
+    snprintf(msg_on, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":true}",ID_PLACA);
+    snprintf(msg_off, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":false}",ID_PLACA);
+
     // Intento de conectarse
-    sprintf(topic_conexion, "II12/ESP%s/conexion",ID_PLACA);
-    snprintf (msg_on, MSG_BUFFER_SIZE, "{"CHIPID":"ESP1234","online":true}");
-    snprintf (msg_off, MSG_BUFFER_SIZE, "{"CHIPID":"ESP1234","online":false}");
-    
-    if (client.connect(clientId.c_str(),topic_conexion,2,true,msg_off)) //Función connecto con LWM retenido
+    if (client.connect(clientId.c_str(),topic_conexion,2,true,msg_off)) //Función conexion con LWM retenido
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("infind/GRUPO12/datos", "Conexion al topic exitosa");     // Publicamos los datos del sensor en "infind/GRUPO12/datos".
-      client.publish("infind/GRUPO12/conexion", "Conexion al topic exitosa");  //Publicamos el estado de conexion en "infind/GRUPO12/conexion"
+      client.publish(topic_conexion, "Conexion al topic exitosa");        // Publicamos el estado de conexion en "II12/ID_PLACA/conexion"
+      client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
+      client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
+      client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
       
       // ... and resubscribe
-      client.subscribe("infind/GRUPO12/led/cmd");  // Nos suscribimos al topic "infind/GRUPO12/led/cmd" para el control del LED.
+      client.subscribe(topic_config);  // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
+      client.subscribe(topic_led_cmd);  // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
+      client.subscribe(topic_switch_cmd);  // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
 
-      client.publish(topic_conexion,msg_on ,true);       //Publicamos el estado de la conexión, mensaje retenidp
+      client.publish(topic_conexion,msg_on,true);       //Publicamos el estado de la conexión, mensaje retenido
         
     } else {           
       //En caso de no conseguir conectarse se muestra en el puerto serie los mensajes de fallo, se reintenta la conexión
@@ -212,11 +224,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   // Mostramos por pantalla el topic recibido.
   Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
 
-  // MENSAJE: Configuración
-  String topic_config="II12/ESP"+String(ID_PLACA)+"/config";
-  if(strcmp(topic, char(topic_config))==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  // MENSAJE: Configuración  
+  if(strcmp(topic,topic_config)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
   {
-      StaticJsonDocument<128> root; // el tamaño del buffer tiene que ser el adecuado
+      StaticJsonDocument<96> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
       // Deserialize the JSON document
       DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -226,28 +237,38 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       Serial.println(error.c_str());
       }
       else
-      if(root.containsKey("envia"))  // comprobar si existe el campo/clave que estamos buscando
+      if(root.containsKey("envia"))  // Se comprueba si existe el campo "envia"
       { 
-        vel_envio = root["envia"];          // Lo que hay en el campo "envia" del payload se guarda en la variable "vel_encio".
+        vel_envio = root["envia"];          // Velocidad de envio de datos
         vel_fota = root["actualiza"];       // Velocidad actualización FOTA (min)
         vel_PWM = root["velocidad"];        // Velocidad de incremento PWM
-        LED_logica = root["LED"];          //Logica del LED1
-        SWITCH_logica = root["SWITCH"];    //Logica del LED2
+        LED_logica = root["LED"];           // Logica del LED1
+        SWITCH_logica = root["SWITCH"];     // Logica del LED2
         
         Serial.printf("Mensaje OK, nueva configuración. Velocidad de publicación %d, velocidad de actualización %d, velocidad PWM %d, logicad del led PWM %d y logica del SWITCH %s",vel_envio,vel_fota,LED_logica,SWITCH_logica);
 
+      }
+      else
+      {
+        Serial.print("Error : ");
+        Serial.println("key not found in JSON");
       }
     
   }
   
   // MENSAJE: Control LED PWM
-  String topic_led_cmd="II12/ESP"+String(ID_PLACA)+"/led/cmd";
-  if(strcmp(topic, char(topic_led_cmd))==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
   {
-    StaticJsonDocument<32> root; // el tamaño del buffer tiene que ser el adecuado
+    // Variable Json para desearializar el mensaje
+    StaticJsonDocument<32> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
+    //Variables para operar:
+    int PWM_led;  // Guarda contenido del campo "level" del mensaje 
+    int PWM;      // Variable para el control del LED1
+    char id;      // Guarda el identificador del mensaje
+    
     // Compruebo si no hubo error
     if (error) {
       Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
@@ -255,92 +276,39 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
     }
     
     else
-      if(root.containsKey("level"))  // comprobar si existe el campo/clave que estamos buscando
+      if(root.containsKey("level"))  // Se comprueba si existe el campo "level"
       { 
-        PWM_led = root["level"];    // Lo que hay en el campo "level" del payload se guarda en la variable "valor_led".
+        PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
+        id = root["id"];            // Se guarda el contenido del campo "id"
+        
+        // Se muestra info del mensaje
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
-
-        int PWM;
-        if(LED_logica==0){                     // Pasamos de escala 100-0 a 255-0.
-        PWM = 255 - PWM_led*(255/100);        // A 255 le restamos "valor_led*(255/100)" para darle la vuelta a la escala.
+        
+        // Cambio de escala de [0,100] a [0,255]:
+        if(LED_logica==0){                     
+        PWM = 255 - PWM_led*(255/100);         // Logica inversa
         }                                      
         else{
-        PWM=PWM_led*(255/100);                // 
+        PWM=PWM_led*(255/100);                // Logica directa
         }
-      }
         
-        analogWrite(LED2,PWM);    // Escribimos en el LED2 el valor de PWM.
+        analogWrite(LED1,PWM);    // Escribimos en el LED1 el valor de PWM.
 
-        // Cuando cambie el valor de la intensidad del led, enviamos un mensaje.
+        // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
         if(PWM_led != PWM_status)
         {
-          // Información del LED
-          snprintf (msg, MSG_BUFFER_SIZE, "{\"CHIPID\":%s\"LED\": %d}",ID_PLACA, PWM_led);
+          // Genera mensaje para publicar
+          snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"LED\": %d,\"origen\":mqtt,\"id\":%s}",ID_PLACA, PWM_led,id); 
           Serial.print("Mensaje de confirmación de intensidad: ");
-          Serial.println(msg);
-          
-          String topic_led = "II12/ESP"+String(ID_PLACA)+"/led/status";
-          
-          client.publish(char(topic_led), msg);
+          Serial.println(msg_led);
+  
+          // Publicamos mensaje     
+          client.publish(topic_led_status, msg_led);
 
-          PWM_status = PWM_led;
+          PWM_status = PWM_led; // Guarda nuevo valor en la variable global
         }
-      else
-      {
-        Serial.print("Error : ");
-        Serial.println("\"level\" key not found in JSON");
       }
-    }
-
-  //MENSAJE: Control LED Switch
-  sprintf(topic_switch, "II12/ESP%s/swithc/cmd",ID_PLACA);
- 
-  else if(strcmp(topic, char(topic_switch))==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
-  {
- 
-    StaticJsonDocument<64> root; // el tamaño del buffer tiene que ser el adecuado
-    
-    // Deserialize the JSON document
-    DeserializationError error = deserializeJson(root, mensaje,length);
-
-    // Compruebo si no hubo error
-    if (error) {
-      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
-      Serial.println(error.c_str());
-    }
-
-    else
-      if(root.containsKey("level"))  // comprobar si existe el campo/clave que estamos buscando
-      { 
-        Switch_led = root["level"];    // Lo que hay en el campo "level" del payload se guarda en la variable "valor_led".
-        Serial.print("Mensaje OK, valor del switch = ");
-        Serial.println(PWM_led);
-
-        bool SWITCH;
-        if(SWITCH_logica==0){
-        SWITCH = not(Switch_led); 
-        }
-        else{
-        SWITCH = Switch_led);
-        }
-      }                                        
-                                               
-        digitalWrite(LED2,SWITCH);    // Escribimos en el LED2 el valor de PWM.
-
-        // Cuando cambie el valor de la intensidad del led, enviamos un mensaje.
-        if(Switch_led != Switch_status)
-        {
-          // Información del LED
-          snprintf (msg, MSG_BUFFER_SIZE, "{\"LED\": %d}", Switch_led);
-          Serial.print("Mensaje de confirmación del switch: ");
-          Serial.println(msg);
-
-          String topic_led = "II12/ESP"+String(ID_PLACA)+"/switch/status";
-          client.publish(char(topic_led), msg);
-
-          Switch_status = Switch_led;
-        }
       else
       {
         Serial.print("Error : ");
@@ -348,7 +316,65 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       }
   }
 
+  //MENSAJE: Control LED Switch
+  else if(strcmp(topic,topic_switch_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  {
+    // Variable Json para desearializar el mensaje
+    StaticJsonDocument<64> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(root, mensaje,length);
+
+    //Variables para operar:
+     int Switch_led; // Guarda contenido del campo "level" del mensaje
+     bool SWITCH;    // Variable para el control del LED1
+     char id;        // Guarda el identificador del mensaje
+     
+    // Compruebo si no hubo error
+    if (error) {
+      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
+      Serial.println(error.c_str());
+    }
+
+    else
+      if(root.containsKey("level"))    // Se comprueba si existe el campo "level"
+      { 
+        Switch_led = root["level"];    // Se guarda el contenido del campo "level" 
+        id = root["id"];               // Se guarda el contenido del campo "id"
+
+        // Se muestra info del mensaje
+        Serial.print("Mensaje OK, valor del switch = ");
+        Serial.println(Switch_led);
+
+        // Se configura la salida en función del tipo de logica que se aplique
+        if(SWITCH_logica==0){       // Logica inversa
+        SWITCH = not(Switch_led); 
+        }
+        else{                       // Logica directa
+        SWITCH = Switch_led;
+        }
+        
+        digitalWrite(LED2,SWITCH);    // Escribimos en el LED2 el valor de SWITCH                                        
+
+        // Cuando cambie el valor de la intensidad del led, enviamos un mensaje.
+        if(Switch_led != Switch_status)
+        {
+          // Genera mensaje para publicar
+          snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"SWITCH\": %d,\"origen\":mqtt,\"id\":%s}",ID_PLACA, Switch_led,id); 
+          Serial.print("Mensaje de confirmación de intensidad: ");
+          Serial.println(msg_led);
   
+          // Publicamos mensaje     
+          client.publish(topic_switch_status, msg_led);
+
+          Switch_status = Switch_led;   // Guarda nuevo valor en la variable global
+        }
+      }
+      else
+      {
+        Serial.print("Error : ");
+        Serial.println("\"level\" key not found in JSON");
+      }
+  }
   else
   {
     Serial.println("Error: Topic desconocido");
@@ -357,24 +383,11 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   free(mensaje);    // Para liberar memoria.
 }
 
-//-------------SERIALIZA JSON----------------
-      
-char serializa_JSON (char* payload)
-{
-  StaticJsonDocument<300> jsonRoot;
-  char jsonString;
- 
-  jsonRoot= payload;
-  
-  serializeJson(jsonRoot,jsonString);
-  return jsonString;
-}
-
 //-------------SERIALIZA SPRINTF-------------------------------
 
 void serializa_sprintf(struct registro_datos datos, char *cadena, int size)
 {
-  snprintf(cadena,size,"{\"CHIPID\":%s\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
+  snprintf(cadena,size,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
                         datos.chipid, datos.tiempo, datos.bateria, datos.temp, datos.hum, datos.valor_led, datos.valor_switch, datos.SSId, datos.ip.toString().c_str(), datos.rssi);
 }
 
@@ -401,6 +414,14 @@ void setup() {
   client.setCallback(procesa_mensaje);
   client.setBufferSize(512);
 
+  // Definimos los topics que vamos a usar:
+  sprintf(topic_conexion, "II12/%s/conexion",ID_PLACA);
+  sprintf(topic_datos, "II12/%s/datos",ID_PLACA);
+  sprintf(topic_config, "II12/%s/config",ID_PLACA);
+  sprintf(topic_led_cmd, "II12/%s/led/cmd",ID_PLACA);
+  sprintf(topic_led_status, "II12/%s/led/status",ID_PLACA);
+  sprintf(topic_switch_cmd, "II12/%s/swithc/cmd",ID_PLACA);
+  sprintf(topic_switch_status, "II12/%s/switch/status",ID_PLACA);
 }
 
 //-------------------------MAIN-------------------------------
@@ -441,21 +462,15 @@ void loop() {
     misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
 
     // Actualizamos valores de los leds 
-    misdatos.valor_led = PWM_led;
-    misdatos.valor_switch = status_led;
+    misdatos.valor_led = PWM_status;
+    misdatos.valor_switch = Switch_status;
     
-    // Generamos el mensaje:
-    serializa_sprintf(misdatos, msg, MSG_BUFFER_SIZE);
+    // Generamos el mensaje JSON:
+    serializa_sprintf(misdatos, msg_datos, MSG_BUFFER_SIZE);
+    Serial.print("Mensaje JSON: ");
+    Serial.println(msg_datos); 
 
-    // Generamos el mensaje en JSON:
-    Serial.println(serializa_JSON(msg));
-    
-    snprintf (msg_json, MSG_BUFFER_SIZE,serializa_JSON(msg));
-    Serial.print("Datos: ");
-    Serial.println(msg);
-
-    sprintf(topic_datos, "II12/ESP%s/datos",ID_PLACA);
-    client.publish(topic_datos, msg_json);   
+    client.publish(topic_datos, msg_datos);   //Se publica el mensaje en el topic correspondiente
   }
 
 }
