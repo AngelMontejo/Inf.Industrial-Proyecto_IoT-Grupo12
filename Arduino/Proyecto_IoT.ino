@@ -528,8 +528,8 @@ void loop() {
   }
 
   // Función del boton:
-    button.loop();  // Llamamos a la funcion del boton
-    int PWM_led;    // Variable controla intensidad del LED
+    button.loop();             // Llamamos a la funcion del boton
+    int PWM_led=PWM_status;    // Variable controla intensidad del LED
     
     if(strcmp(tipo_pulsacion,"simpleclick")){
           if (PWM_status>0){ 
