@@ -3,6 +3,7 @@
 #include "DHTesp.h"
 #include <ESP8266httpUpdate.h>
 #include <ArduinoJson.h>
+#include "Button2.h"
 
 //--------------DEFINICION VARIABLES--------------------------
 //Datos para actualización OTA:
@@ -46,6 +47,7 @@ int SENSOR = 5;       //Pin de datos del sensor
 //Variables de led:
 char ID_PLACA[16];        // Cadenas para ID de la placa
 int PWM_status;           // Variable que indica estado del LED1
+int valor_anterior=-1;    // Variable guarda valor PWM para funcion del boton
 int Switch_status;        // Variable que indica estado del LED2
 
 //Variables de configuración
@@ -54,6 +56,11 @@ int vel_fota=0;
 int vel_PWM;
 int LED_logica=0;
 int SWITCH_logica=0;
+
+//Variables botones
+#define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
+Button2 button;         // Objeto de la cabecera button2.h
+char* tipo_pulsacion;   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
 const char* ssid = "infind";                // Usuario del punto de acceso.
@@ -214,6 +221,30 @@ void reconnect() {
   }
 }
 
+//-------------------FUNCIONES BOTON-----------------------
+void pressed(Button2& btn) {      // Se llama cuando se pulsa el boton
+    Serial.println("pressed");
+}
+void released(Button2& btn) {     // Se llama cuando se libera el boton
+    Serial.print("released: ");
+    Serial.println(btn.wasPressedFor());
+}
+void click(Button2& btn) {
+    Serial.println("click\n");
+    tipo_pulsacion="simpleclick";
+}
+void longClickDetected(Button2& btn) {
+    Serial.println("long click detected\n");
+}
+void longClick(Button2& btn) {
+    Serial.println("long click\n");
+    tipo_pulsacion="longclick";
+}
+void doubleClick(Button2& btn) {
+    Serial.println("double click\n");
+    tipo_pulsacion="doubleclick";
+}
+
 //-------------------PROCESAR MENSAJES----------------------------
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   
@@ -221,7 +252,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   strncpy(mensaje, (char*)payload, length); // copio el mensaje en cadena de caracteres
   mensaje[length]='\0';                     // caracter cero marca el final de la cadena
 
-        
 
   // Mostramos por pantalla el topic recibido.
   Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
@@ -295,20 +325,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         }
         
         analogWrite(LED1,PWM);    // Escribimos en el LED1 el valor de PWM.
-
-        // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
-        if(PWM_led != PWM_status)
-        {
-          // Genera mensaje para publicar
-          snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"LED\": %d,\"origen\":mqtt,\"id\":%s}",ID_PLACA, PWM_led,id); 
-          Serial.print("Mensaje de confirmación de intensidad: ");
-          Serial.println(msg_led);
-  
-          // Publicamos mensaje     
-          client.publish(topic_led_status, msg_led);
-
-          PWM_status = PWM_led; // Guarda nuevo valor en la variable global
-        }
       }
       else  // En el mensaje no existe el campo "level"
       {
@@ -431,7 +447,22 @@ void setup() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(procesa_mensaje);
   client.setBufferSize(512);
-
+  
+  // Inicializa funcion del boton:
+  button.begin(BUTTON_PIN);         // Pin del boton
+  button.setLongClickTime(1000);    // Fijamos tiempo del long click
+  button.setDoubleClickTime(400);   // Fijamos tiempo entre doble click
+  Serial.println(" Longpress Time: " + String(button.getLongClickTime()) + "ms");
+  Serial.println(" DoubleClick Time: " + String(button.getDoubleClickTime()) + "ms");
+    // Funciones manejadoras:
+  button.setPressedHandler(pressed);                      // Boton pulsado
+  button.setReleasedHandler(released);                    // Boton liberado
+  button.setClickHandler(click);                          // Single click
+  button.setLongClickDetectedHandler(longClickDetected);  // Detecta click largo
+  button.setLongClickHandler(longClick);                  // Long click
+  button.setDoubleClickHandler(doubleClick);              // Double click
+  
+  
   // Definimos los topics que vamos a usar:
   sprintf(topic_conexion, "II12/%s/conexion",ID_PLACA);
   sprintf(topic_datos, "II12/%s/datos",ID_PLACA);
@@ -459,7 +490,7 @@ void loop() {
   }
   client.loop();
 
-  //Si pasa el tiempo de actualización se comprueba:
+  // Si pasa el tiempo de actualización se comprueba si hay actualizacion FOTA:
    if (vel_fota==0) //Si el campo vel_fota es 0 no se actualiza periodicamente
    {
    }
@@ -468,11 +499,7 @@ void loop() {
     intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
    }
    
-  // Como queremos actualizar los datos cada 'vel_envio' segundos, lo ponemos de condición del if.
-  if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
-    lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
-
-    // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
+  // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
     sprintf( misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
     misdatos.hum = dht.getHumidity();         // Datos de humedad.
     misdatos.temp = dht.getTemperature();     // Datos de temperatura.
@@ -486,6 +513,10 @@ void loop() {
     // Actualizamos valores de los leds 
     misdatos.valor_led = PWM_status;
     misdatos.valor_switch = Switch_status;
+
+    // Manda mensaje de datos, si se supera el tiempo vel_envio
+   if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
+    lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
     
     // Generamos el mensaje JSON:
     snprintf(msg_datos,MSG_BUFFER_SIZE,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
@@ -496,4 +527,42 @@ void loop() {
     client.publish(topic_datos, msg_datos);   //Se publica el mensaje en el topic correspondiente
   }
 
+  // Función del boton:
+    button.loop();  // Llamamos a la funcion del boton
+    int PWM_led;    // Variable controla intensidad del LED
+    
+    if(strcmp(tipo_pulsacion,"simpleclick")){
+          if (PWM_status>0){ 
+            PWM_led=255;  // Se apaga el LED2
+            valor_anterior = PWM_status;
+          }
+          else{
+             PWM_led=valor_anterior;
+             analogWrite(LED2,valor_anterior); //ponemos la intensidad del LED al ultimo valor del slider
+          }
+    }
+    else if(strcmp(tipo_pulsacion,"doubleclick")){
+          PWM_led=0;  // LED2 a nivel máximo
+    }
+    else if(strcmp(tipo_pulsacion,"longclick")){
+          lastAct=millis();
+          intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
+    }
+    
+    analogWrite(LED2,PWM_led); // Escribe el valor calculado
+        
+    // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
+     if(PWM_led != PWM_status)
+     {
+      // Genera mensaje para publicar
+      snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"LED\": %d,\"origen\":pulsador}",ID_PLACA, PWM_led); 
+      Serial.print("Mensaje de confirmación de intensidad: ");
+      Serial.println(msg_led);
+  
+      // Publicamos mensaje     
+      client.publish(topic_led_status, msg_led);
+
+      PWM_status = PWM_led; // Guarda nuevo valor en la variable global
+     }
+    
 }
