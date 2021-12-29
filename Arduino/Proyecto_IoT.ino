@@ -50,7 +50,7 @@ int Switch_status;        // Variable que indica estado del LED2
 
 //Variables de configuración
 int vel_envio=30000;
-int vel_fota;
+int vel_fota=0;
 int vel_PWM;
 int LED_logica=0;
 int SWITCH_logica=0;
@@ -62,7 +62,7 @@ const char* mqtt_server = "172.16.53.138";  // IP del equipo.
 
 
 // Definimos los mensajes que se van a publicar:
-#define MSG_BUFFER_SIZE  (256)  // "#define" permite asignarle un nombre a una constante.
+#define MSG_BUFFER_SIZE  (512)  // "#define" permite asignarle un nombre a una constante.
 char msg_datos[MSG_BUFFER_SIZE];      // Mensaje de datos
 char msg_on[MSG_BUFFER_SIZE];   // Mensaje de conexion activa
 char msg_off[MSG_BUFFER_SIZE];  // Mensaje de conexion inactiva
@@ -82,6 +82,7 @@ PubSubClient client(espClient);
   char* topic_led_status;
   char* topic_switch_cmd;
   char* topic_switch_status;
+  char* topic_fota;
   
 
 //----------------FOTA-----------------------
@@ -195,9 +196,10 @@ void reconnect() {
       client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
       
       // ... and resubscribe
-      client.subscribe(topic_config);  // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
-      client.subscribe(topic_led_cmd);  // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
-      client.subscribe(topic_switch_cmd);  // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
+      client.subscribe(topic_config);       // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
+      client.subscribe(topic_led_cmd);      // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
+      client.subscribe(topic_switch_cmd);   // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
+      client.subscribe(topic_fota);         // Nos suscribimos al topic "II12/ID_PLACA/FOTA" para comprobar las actualizaciones
 
       client.publish(topic_conexion,msg_on,true);       //Publicamos el estado de la conexión, mensaje retenido
         
@@ -225,7 +227,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
 
   // MENSAJE: Configuración  
-  if(strcmp(topic,topic_config)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  if(strcmp(topic,topic_config)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
       StaticJsonDocument<96> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
       // Deserialize the JSON document
@@ -233,11 +235,11 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
       // Compruebo si no hubo error
       if (error) {
-      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
+      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error
       Serial.println(error.c_str());
       }
       else
-      if(root.containsKey("envia"))  // Se comprueba si existe el campo "envia"
+      if(root.containsKey("envia") or root.containsKey("actualiza") or root.containsKey("velocidad") or root.containsKey("LED") or root.containsKey("SWITCH"))  // Se comprueba si existe el campo "envia"
       { 
         vel_envio = root["envia"];          // Velocidad de envio de datos
         vel_fota = root["actualiza"];       // Velocidad actualización FOTA (min)
@@ -248,16 +250,15 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         Serial.printf("Mensaje OK, nueva configuración. Velocidad de publicación %d, velocidad de actualización %d, velocidad PWM %d, logicad del led PWM %d y logica del SWITCH %s",vel_envio,vel_fota,LED_logica,SWITCH_logica);
 
       }
-      else
+      else    // Si el mensaje no incluye ninguno de los campos esperados
       {
         Serial.print("Error : ");
         Serial.println("key not found in JSON");
       }
-    
   }
   
   // MENSAJE: Control LED PWM
-  else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
     // Variable Json para desearializar el mensaje
     StaticJsonDocument<32> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
@@ -309,7 +310,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           PWM_status = PWM_led; // Guarda nuevo valor en la variable global
         }
       }
-      else
+      else  // En el mensaje no existe el campo "level"
       {
         Serial.print("Error : ");
         Serial.println("\"level\" key not found in JSON");
@@ -320,7 +321,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic,topic_switch_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<64> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<32> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -369,13 +370,38 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           Switch_status = Switch_led;   // Guarda nuevo valor en la variable global
         }
       }
-      else
+      else  // En el mensaje no existe el campo "level"
       {
         Serial.print("Error : ");
         Serial.println("\"level\" key not found in JSON");
       }
   }
-  else
+    //MENSAJE: Comprueba actualizacion FOTA
+  else if(strcmp(topic,topic_fota)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
+  {
+    // Variable Json para desearializar el mensaje
+    StaticJsonDocument<16> root;  // Indicamos el tamaño requerido para deserializar mensaje de comprobar FOTA
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(root, mensaje,length);
+     
+    // Compruebo si no hubo error
+    if (error) {
+      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
+      Serial.println(error.c_str());
+    }
+    else
+      if(root.containsKey("actualiza"))    // Se comprueba si existe el campo "actualiza"
+      { 
+        lastAct=millis();
+        intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
+      }
+      else  // En el mensaje no existe el campo "actualiza"
+      {
+        Serial.print("Error : ");
+        Serial.println("\"actualiza\" key not found in JSON");
+      }
+  }
+  else   // Si no se reconoce el topic
   {
     Serial.println("Error: Topic desconocido");
   }
@@ -383,20 +409,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   free(mensaje);    // Para liberar memoria.
 }
 
-//-------------SERIALIZA SPRINTF-------------------------------
-
-void serializa_sprintf(struct registro_datos datos, char *cadena, int size)
-{
-  snprintf(cadena,size,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
-                        datos.chipid, datos.tiempo, datos.bateria, datos.temp, datos.hum, datos.valor_led, datos.valor_switch, datos.SSId, datos.ip.toString().c_str(), datos.rssi);
-}
-
 //-----------------SETUP-------------------------------
 
 void setup() {
   
   pinMode(LED1, OUTPUT);      // Definimos el pin LED1 como un Output. Tambien se corresponde con LED_OTA
-  pinMode(LED2, OUTPUT);      // Definimos el pin LED" como un Output
+  pinMode(LED2, OUTPUT);      // Definimos el pin LED2 como un Output
 
   digitalWrite(LED1, HIGH);   // Inicialmente el LED1 está apagado. Tambien se corresponde con LED_OTA
   digitalWrite(LED2, HIGH);   // Inicialmente el LED2 está apagado.
@@ -422,6 +440,7 @@ void setup() {
   sprintf(topic_led_status, "II12/%s/led/status",ID_PLACA);
   sprintf(topic_switch_cmd, "II12/%s/swithc/cmd",ID_PLACA);
   sprintf(topic_switch_status, "II12/%s/switch/status",ID_PLACA);
+  sprintf(topic_fota, "II12/%s/FOTA",ID_PLACA);
 }
 
 //-------------------------MAIN-------------------------------
@@ -441,13 +460,16 @@ void loop() {
   client.loop();
 
   //Si pasa el tiempo de actualización se comprueba:
-   if (misdatos.tiempo - lastAct > vel_fota) {
+   if (vel_fota==0) //Si el campo vel_fota es 0 no se actualiza periodicamente
+   {
+   }
+   else if (misdatos.tiempo - lastAct > vel_fota*60*1000) { //vel_fota originalmente en minutos, lo pasamos a milisegundos
     lastAct=misdatos.tiempo;
     intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
    }
    
-  // Como queremos actualizar los datos cada 30 s, lo ponemos de condición del if.
-  if (misdatos.tiempo - lastMsg > vel_envio) {
+  // Como queremos actualizar los datos cada 'vel_envio' segundos, lo ponemos de condición del if.
+  if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
     lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
 
     // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
@@ -466,8 +488,9 @@ void loop() {
     misdatos.valor_switch = Switch_status;
     
     // Generamos el mensaje JSON:
-    serializa_sprintf(misdatos, msg_datos, MSG_BUFFER_SIZE);
-    Serial.print("Mensaje JSON: ");
+    snprintf(msg_datos,MSG_BUFFER_SIZE,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
+                        misdatos.chipid, misdatos.tiempo, misdatos.bateria, misdatos.temp, misdatos.hum, misdatos.valor_led, misdatos.valor_switch, misdatos.SSId, misdatos.ip.toString().c_str(), misdatos.rssi);
+    Serial.print("Mensaje JSON de datos: ");
     Serial.println(msg_datos); 
 
     client.publish(topic_datos, msg_datos);   //Se publica el mensaje en el topic correspondiente
