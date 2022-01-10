@@ -51,7 +51,7 @@ int valor_anterior=-1;    // Variable guarda valor PWM para funcion del boton
 int Switch_status;        // Variable que indica estado del LED2
 
 //Variables de configuración
-int vel_envio=30000;
+int vel_envio=30;
 int vel_fota=0;
 int vel_PWM;
 int LED_logica=0;
@@ -60,12 +60,12 @@ int SWITCH_logica=0;
 //Variables botones
 #define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
 Button2 button;         // Objeto de la cabecera button2.h
-char* tipo_pulsacion;   // Variable indica tipo de pulsacion
+char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
 const char* ssid = "infind";                // Usuario del punto de acceso.
 const char* password = "1518wifi";          // Contraseña del punto de acceso.
-const char* mqtt_server = "172.16.53.138";  // IP del equipo.
+const char* mqtt_server = "172.16.53.142";  // IP del equipo.
 
 
 // Definimos los mensajes que se van a publicar:
@@ -82,14 +82,14 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Definimos los topics:
-  char* topic_conexion;
-  char* topic_datos;
-  char* topic_config;
-  char* topic_led_cmd;
-  char* topic_led_status;
-  char* topic_switch_cmd;
-  char* topic_switch_status;
-  char* topic_fota;
+  char topic_conexion[50];
+  char topic_datos[50];
+  char topic_config[50];
+  char topic_led_cmd[50];
+  char topic_led_status[50];
+  char topic_switch_cmd[50];
+  char topic_switch_status[50];
+  char topic_fota[50];
   
 
 //----------------FOTA-----------------------
@@ -185,14 +185,14 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     
     // Generamos el identificador del cliente 
-    String clientId = "ESP8266Client-";
-    clientId += String(ID_PLACA);
+    String clientId = "II12";
     
     // Definimos los mensajes de conexion y desconexion
     snprintf(msg_on, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":true}",ID_PLACA);
     snprintf(msg_off, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":false}",ID_PLACA);
 
-    // Intento de conectarse
+
+    // Intento de conectarse    PONER CLIENTE BIEN Y CONTRASEÑA
     if (client.connect(clientId.c_str(),topic_conexion,2,true,msg_off)) //Función conexion con LWM retenido
     {
       Serial.println("connected");
@@ -207,7 +207,7 @@ void reconnect() {
       client.subscribe(topic_led_cmd);      // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
       client.subscribe(topic_switch_cmd);   // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
       client.subscribe(topic_fota);         // Nos suscribimos al topic "II12/ID_PLACA/FOTA" para comprobar las actualizaciones
-
+      Serial.println(topic_datos); 
       client.publish(topic_conexion,msg_on,true);       //Publicamos el estado de la conexión, mensaje retenido
         
     } else {           
@@ -231,18 +231,21 @@ void released(Button2& btn) {     // Se llama cuando se libera el boton
 }
 void click(Button2& btn) {
     Serial.println("click\n");
-    tipo_pulsacion="simpleclick";
+    sprintf(tipo_pulsacion, "simpleclick");
+    //tipo_pulsacion="simpleclick";
 }
 void longClickDetected(Button2& btn) {
     Serial.println("long click detected\n");
 }
 void longClick(Button2& btn) {
     Serial.println("long click\n");
-    tipo_pulsacion="longclick";
+    sprintf(tipo_pulsacion, "longclick");
+   // tipo_pulsacion="longclick";
 }
 void doubleClick(Button2& btn) {
     Serial.println("double click\n");
-    tipo_pulsacion="doubleclick";
+    sprintf(tipo_pulsacion, "doubleclick");
+   // tipo_pulsacion="doubleclick";
 }
 
 //-------------------PROCESAR MENSAJES----------------------------
@@ -454,6 +457,7 @@ void setup() {
   button.setDoubleClickTime(400);   // Fijamos tiempo entre doble click
   Serial.println(" Longpress Time: " + String(button.getLongClickTime()) + "ms");
   Serial.println(" DoubleClick Time: " + String(button.getDoubleClickTime()) + "ms");
+ 
     // Funciones manejadoras:
   button.setPressedHandler(pressed);                      // Boton pulsado
   button.setReleasedHandler(released);                    // Boton liberado
@@ -461,10 +465,10 @@ void setup() {
   button.setLongClickDetectedHandler(longClickDetected);  // Detecta click largo
   button.setLongClickHandler(longClick);                  // Long click
   button.setDoubleClickHandler(doubleClick);              // Double click
-  
+
   
   // Definimos los topics que vamos a usar:
-  sprintf(topic_conexion, "II12/%s/conexion",ID_PLACA);
+  sprintf(topic_conexion, "infind/II12/%s/conexion",ID_PLACA);
   sprintf(topic_datos, "II12/%s/datos",ID_PLACA);
   sprintf(topic_config, "II12/%s/config",ID_PLACA);
   sprintf(topic_led_cmd, "II12/%s/led/cmd",ID_PLACA);
@@ -472,6 +476,8 @@ void setup() {
   sprintf(topic_switch_cmd, "II12/%s/swithc/cmd",ID_PLACA);
   sprintf(topic_switch_status, "II12/%s/switch/status",ID_PLACA);
   sprintf(topic_fota, "II12/%s/FOTA",ID_PLACA);
+  
+ 
 }
 
 //-------------------------MAIN-------------------------------
@@ -517,7 +523,7 @@ void loop() {
     // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
     lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
-    
+    Serial.print("OK");
     // Generamos el mensaje JSON:
     snprintf(msg_datos,MSG_BUFFER_SIZE,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
                         misdatos.chipid, misdatos.tiempo, misdatos.bateria, misdatos.temp, misdatos.hum, misdatos.valor_led, misdatos.valor_switch, misdatos.SSId, misdatos.ip.toString().c_str(), misdatos.rssi);
