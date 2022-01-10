@@ -1762,7 +1762,7 @@
         "correl": "",
         "expiry": "",
         "broker": "9fc359fe91a6b818",
-        "x": 980,
+        "x": 1120,
         "y": 2260,
         "wires": []
     },
@@ -1786,7 +1786,7 @@
         "max": "100",
         "step": "10",
         "className": "",
-        "x": 140,
+        "x": 280,
         "y": 2320,
         "wires": [
             [
@@ -1814,7 +1814,7 @@
         "max": "500",
         "step": "25",
         "className": "",
-        "x": 130,
+        "x": 270,
         "y": 2260,
         "wires": [
             [
@@ -1842,7 +1842,7 @@
         "max": "20",
         "step": 1,
         "className": "",
-        "x": 140,
+        "x": 280,
         "y": 2380,
         "wires": [
             [
@@ -1876,7 +1876,7 @@
         "offcolor": "",
         "animate": false,
         "className": "",
-        "x": 130,
+        "x": 270,
         "y": 2440,
         "wires": [
             [
@@ -1910,7 +1910,7 @@
         "offcolor": "",
         "animate": false,
         "className": "",
-        "x": 130,
+        "x": 270,
         "y": 2500,
         "wires": [
             [
@@ -1931,7 +1931,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 950,
+        "x": 1090,
         "y": 2400,
         "wires": []
     },
@@ -1946,7 +1946,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 780,
+        "x": 920,
         "y": 2260,
         "wires": [
             [
@@ -1974,7 +1974,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 400,
+        "x": 520,
         "y": 2260,
         "wires": [
             []
@@ -1999,7 +1999,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 390,
+        "x": 530,
         "y": 2320,
         "wires": [
             []
@@ -2024,7 +2024,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 390,
+        "x": 530,
         "y": 2380,
         "wires": [
             []
@@ -2049,7 +2049,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 370,
+        "x": 510,
         "y": 2440,
         "wires": [
             []
@@ -2074,7 +2074,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 380,
+        "x": 480,
         "y": 2500,
         "wires": [
             []
@@ -2101,7 +2101,7 @@
         "topic": "",
         "payload": "{ }",
         "payloadType": "json",
-        "x": 630,
+        "x": 770,
         "y": 2260,
         "wires": [
             [
@@ -2131,7 +2131,7 @@
         "type": "function",
         "z": "bbfa8f7b0d4d1efe",
         "name": "mensaje bienvenida y cambio intensidad",
-        "func": "var valor=parseInt(msg.payload.content)\nif(valor>=0 && valor<=100)\n{\n msg.payload.content=\"Se ha cambiado la intensidad del led a \"+valor;\n msg.payload.intensidad=valor\n}\nelse if(valor<=0 || valor>100)\n{\n msg.payload.content=\"Se necesita un valor entre 0 y 100 para cambiar la intensidad del led\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nelse if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \" +msg.originalMessage.from.first_name+  \", soy el bot del Grupo 12. Puedo responderte a estos comandos:\\n/start\\n/datos\\n/config\\n/led\\n/cambiar\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nreturn msg;",
+        "func": "var valor=parseInt(msg.payload.content)\nif(valor>=0 && valor<=100)\n{\n msg.payload.content=\"Se ha cambiado la intensidad del led a \"+valor;\n msg.payload.intensidad=valor\n}\nelse if(valor<0 || valor>100)\n{\n msg.payload.content=\"Se necesita un valor entre 0 y 100 para cambiar la intensidad del led\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nelse if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \" +msg.originalMessage.from.first_name+  \", soy el bot del Grupo 12. Puedo responderte a estos comandos:\\n/start\\n/datos\\n/config\\n/led\\n/cambiarled\\n/switch\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2142,7 +2142,8 @@
         "wires": [
             [
                 "b50a0c49046114ee",
-                "eba64ca959e4031e"
+                "eba64ca959e4031e",
+                "362e47e61fb5b862"
             ]
         ]
     },
@@ -2584,8 +2585,8 @@
         "bot": "6f668e01f59ddde0",
         "haserroroutput": false,
         "outputs": 1,
-        "x": 910,
-        "y": 2780,
+        "x": 870,
+        "y": 2760,
         "wires": [
             []
         ]
@@ -2595,7 +2596,7 @@
         "type": "telegram command",
         "z": "bbfa8f7b0d4d1efe",
         "name": "",
-        "command": "/cambiar",
+        "command": "/cambiarled",
         "description": "",
         "registercommand": false,
         "language": "",
@@ -2606,7 +2607,7 @@
         "useregex": false,
         "removeregexcommand": false,
         "outputs": 2,
-        "x": 300,
+        "x": 310,
         "y": 2880,
         "wires": [
             [
@@ -2620,7 +2621,7 @@
         "type": "function",
         "z": "bbfa8f7b0d4d1efe",
         "name": "mensaje respuesta",
-        "func": "if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Introduce intensidad del led entre 0 y 100 \" \n return msg;\n}",
+        "func": "msg.payload.content=\"Introduce intensidad del led entre 0 y 100 \" \nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2658,6 +2659,171 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "362e47e61fb5b862",
+        "type": "debug",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 2620,
+        "wires": []
+    },
+    {
+        "id": "83350c12f107c311",
+        "type": "telegram command",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "command": "/switch",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "6f668e01f59ddde0",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 2940,
+        "wires": [
+            [
+                "3ad4532bc7524b3a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3ad4532bc7524b3a",
+        "type": "function",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "mensaje respuesta",
+        "func": "if (flow.get(\"switches\")===true)\n{\n    msg.payload.content=\"Switch apagado\"\n    msg.payload.sw=false;\n}\nelse if (flow.get(\"switches\")===false)\n{\n    msg.payload.content=\"Switch encendido\"\n    msg.payload.sw=true;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 2940,
+        "wires": [
+            [
+                "b50a0c49046114ee",
+                "11da285f43f1a31f",
+                "8b38b18e4bd37eeb"
+            ]
+        ]
+    },
+    {
+        "id": "11da285f43f1a31f",
+        "type": "change",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "switches",
+                "pt": "flow",
+                "to": "payload.sw",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 880,
+        "y": 2920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b7a0a1199ba087f1",
+        "type": "inject",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ }",
+        "payloadType": "json",
+        "x": 90,
+        "y": 2320,
+        "wires": [
+            [
+                "65fa9d9a2c963d9f",
+                "4e465de12b368ac1",
+                "ce8a5c23834abb40"
+            ]
+        ]
+    },
+    {
+        "id": "d4f9ca2f742f393e",
+        "type": "inject",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 90,
+        "y": 2460,
+        "wires": [
+            [
+                "0fb6cd3ad3ca247c",
+                "46c3fc5c60f58d99"
+            ]
+        ]
+    },
+    {
+        "id": "8b38b18e4bd37eeb",
+        "type": "debug",
+        "z": "bbfa8f7b0d4d1efe",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 2980,
+        "wires": []
     },
     {
         "id": "b7740595cf4aee98",
