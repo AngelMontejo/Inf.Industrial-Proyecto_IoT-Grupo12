@@ -30,9 +30,9 @@ struct registro_datos    //Definimos una estructura de datos para guardar todos 
       float hum;
       float bateria;
       int valor_led;
-      bool valor_switch;
+      int valor_switch;
       char chipid[16];
-      char* SSId;
+      char SSId[16];
       int32_t rssi;
       IPAddress ip;
 };
@@ -65,11 +65,12 @@ char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 // Datos para conectar a WIFI
 const char* ssid = "infind";                // Usuario del punto de acceso.
 const char* password = "1518wifi";          // Contraseña del punto de acceso.
-const char* mqtt_server = "172.16.53.142";  // IP del equipo.
-
+const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
+const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
+const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
 
 // Definimos los mensajes que se van a publicar:
-#define MSG_BUFFER_SIZE  (512)  // "#define" permite asignarle un nombre a una constante.
+#define MSG_BUFFER_SIZE  (250)  // "#define" permite asignarle un nombre a una constante.
 char msg_datos[MSG_BUFFER_SIZE];      // Mensaje de datos
 char msg_on[MSG_BUFFER_SIZE];   // Mensaje de conexion activa
 char msg_off[MSG_BUFFER_SIZE];  // Mensaje de conexion inactiva
@@ -184,16 +185,16 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     
-    // Generamos el identificador del cliente 
-    String clientId = "II12";
+    // Generamos el identificador del cliente con el identificador de la placa:
+    String clientId = String(ID_PLACA);
     
     // Definimos los mensajes de conexion y desconexion
     snprintf(msg_on, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":true}",ID_PLACA);
     snprintf(msg_off, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":false}",ID_PLACA);
 
 
-    // Intento de conectarse    PONER CLIENTE BIEN Y CONTRASEÑA
-    if (client.connect(clientId.c_str(),topic_conexion,2,true,msg_off)) //Función conexion con LWM retenido
+    // Intento de conectarse
+    if (client.connect(clientId.c_str(),mqtt_user,mqtt_pass,topic_conexion,2,true,msg_off)) //Función conexion con LWM retenido
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
@@ -201,13 +202,12 @@ void reconnect() {
       client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
       client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
       client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
-      
+       
       // ... and resubscribe
       client.subscribe(topic_config);       // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
       client.subscribe(topic_led_cmd);      // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
       client.subscribe(topic_switch_cmd);   // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
       client.subscribe(topic_fota);         // Nos suscribimos al topic "II12/ID_PLACA/FOTA" para comprobar las actualizaciones
-      Serial.println(topic_datos); 
       client.publish(topic_conexion,msg_on,true);       //Publicamos el estado de la conexión, mensaje retenido
         
     } else {           
@@ -441,7 +441,8 @@ void setup() {
   Serial.begin(115200);       // Establecemos la velocidad del puerto serie
   
   sprintf(ID_PLACA, "ESP%d", ESP.getChipId()); // Función obtener ID de la placa
-  
+  Serial.print("\nEl ID de la placa es: ");
+  Serial.println(ID_PLACA);
   dht.setup(SENSOR, DHTesp::DHT11);      // Set el pin SENSOR que se conecta al sensor DHT11 
   
   setup_wifi();     //Llamamos a la función que se conecta al wifi
@@ -480,13 +481,36 @@ void setup() {
  
 }
 
+//---------------------SERIALIZA JSON---------------------
+String serializa_JSON (struct registro_datos datos)
+{
+  StaticJsonDocument<256> jsonRoot;
+  String jsonString;
+  Serial.println(datos.ip);
+  jsonRoot["CHIPID"]=datos.chipid;
+  jsonRoot["Uptime"]= datos.tiempo;
+  jsonRoot["Vcc"]=datos.bateria;
+  JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
+  DHT11["Temperatura"] = datos.temp;
+  DHT11["Hunedad"] = datos.hum;
+  jsonRoot["LED"]=datos.valor_led;
+  jsonRoot["SWITCH"]=datos.valor_switch;
+  JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
+  Wifi["SSID"]=datos.SSId;
+  Wifi["IP"]=datos.ip.toString().c_str();
+  Wifi["RSSI"]=datos.rssi;
+  
+  
+  serializeJson(jsonRoot,jsonString);
+  return jsonString;
+}
 //-------------------------MAIN-------------------------------
 
 void loop() {
 
   // Definimos la estructura de datos del tipo registro_datos
   struct registro_datos misdatos;        
-
+  
   // Guardamos en el campo 'tiempo' el tiempo actual en ms
   misdatos.tiempo = millis();
   
@@ -504,29 +528,29 @@ void loop() {
     lastAct=misdatos.tiempo;
     intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
    }
-   
-  // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
-    sprintf( misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
-    misdatos.hum = dht.getHumidity();         // Datos de humedad.
-    misdatos.temp = dht.getTemperature();     // Datos de temperatura.
-    misdatos.bateria = ESP.getVcc();          // Medimos la alimentación de la placa.
-
-    // Actualizamos datos de conexión.
-    sprintf( misdatos.SSId, ssid);           // Datos del ssid.
-    misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
-    misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
-
-    // Actualizamos valores de los leds 
-    misdatos.valor_led = PWM_status;
-    misdatos.valor_switch = Switch_status;
-
+    
     // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
     lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
-    Serial.print("OK");
+
+    // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
+    sprintf(misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
+    misdatos.hum = dht.getHumidity();         // Datos de humedad.
+    misdatos.temp = dht.getTemperature();     // Datos de temperatura.
+    misdatos.bateria = ESP.getVcc();          // Medimos la alimentación de la placa.
+   
+    // Actualizamos datos de conexión.
+    sprintf(misdatos.SSId, ssid);           // Datos del ssid.
+    misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
+    misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
+   
+    // Actualizamos valores de los leds 
+    misdatos.valor_led = PWM_status;
+    misdatos.valor_switch = Switch_status;
+    
     // Generamos el mensaje JSON:
-    snprintf(msg_datos,MSG_BUFFER_SIZE,"{\"CHIPID\":%s,\"Uptime\": %u, \"Vcc\": %f, \"DHT11\": {\"Temperatura\": %f, \"Humedad\": %f }, \"LED\": %d, \"SWITCH\": %b, \"Wifi\": {\"SSID\": \"%s\", \"IP\": \"%s\", \"RSSI\": %d }}",
-                        misdatos.chipid, misdatos.tiempo, misdatos.bateria, misdatos.temp, misdatos.hum, misdatos.valor_led, misdatos.valor_switch, misdatos.SSId, misdatos.ip.toString().c_str(), misdatos.rssi);
+    String msg_JSON=serializa_JSON(misdatos);
+    strcpy(msg_datos,msg_JSON.c_str());
     Serial.print("Mensaje JSON de datos: ");
     Serial.println(msg_datos); 
 
@@ -544,7 +568,7 @@ void loop() {
           }
           else{
              PWM_led=valor_anterior;
-             analogWrite(LED2,valor_anterior); //ponemos la intensidad del LED al ultimo valor del slider
+             analogWrite(LED1,valor_anterior); //ponemos la intensidad del LED al ultimo valor del slider
           }
     }
     else if(strcmp(tipo_pulsacion,"doubleclick")){
@@ -555,7 +579,7 @@ void loop() {
           intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
     }
     
-    analogWrite(LED2,PWM_led); // Escribe el valor calculado
+    analogWrite(LED1,PWM_led); // Escribe el valor calculado
         
     // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
      if(PWM_led != PWM_status)
