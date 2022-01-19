@@ -1,3 +1,70 @@
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include "DHTesp.h"
+#include <ESP8266httpUpdate.h>
+#include <ArduinoJson.h>
+#include "Button2.h"
+
+//--------------DEFINICION VARIABLES--------------------------
+//Datos para actualización OTA:
+#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
+#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
+#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
+#define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
+
+//Funciones para progreso de OTA
+void progreso_OTA(int,int);
+void final_OTA();
+void inicio_OTA();
+void error_OTA(int);
+unsigned long lastAct=0;
+
+
+//Datos sensor y estructura de datos
+DHTesp dht;           // Objeto sensor
+ADC_MODE(ADC_VCC);    // Función para poder medir la alimentación de la placa.
+
+struct registro_datos    //Definimos una estructura de datos para guardar todos los datos que queremos enviar
+     {unsigned long tiempo;   
+      float temp;
+      float hum;
+      float bateria;
+      int valor_led;
+      int valor_switch;
+      char chipid[16];
+      char SSId[16];
+      int32_t rssi;
+      IPAddress ip;
+};
+
+
+// GPIOs 
+int LED1 = 2;         //Pin del LED PWM
+int LED2 = 16;        //Pin del LED interruptor
+int LED_OTA = 2;      //Pin del LED usado durante la actualización FOTA
+int SENSOR = 5;       //Pin de datos del sensor
+
+//Variables de led:
+char ID_PLACA[16];        // Cadenas para ID de la placa
+int PWM_status;           // Variable que indica estado del LED1
+int PWM_anterior;         // Variable guarda valor PWM anterior
+int Switch_status;        // Variable que indica estado del LED2
+int Switch_anterior;      // Variable guarda valor SWITCH anterior
+
+//Variables de configuración
+int vel_envio=30;
+int vel_fota=0;
+int vel_PWM;
+int LED_logica=0;
+int SWITCH_logica=0;
+
+//Variables botones
+#define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
+Button2 button;         // Objeto de la cabecera button2.h
+char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
+
+// Datos para conectar a WIFI
+const char* ssid = "MIWIFI_E32g";                // Usuario del punto de acceso.
 const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
@@ -216,7 +283,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   char* mensaje = (char*)malloc(length+1);  // reservo memoria para copia del mensaje
   strncpy(mensaje, (char*)payload, length); // copio el mensaje en cadena de caracteres
   mensaje[length]='\0';                     // caracter cero marca el final de la cadena
-
 
   // Mostramos por pantalla el topic recibido.
   Serial.printf("Mensaje recibido [%s] %s\n", topic, mensaje);
@@ -520,7 +586,6 @@ void loop() {
     intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
    }
 
-  
   // Loop del boton:
     button.loop();             // Llamamos a la funcion del boton
     
@@ -530,12 +595,12 @@ void loop() {
 
     // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
     sprintf(misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
-    misdatos.hum = dht.getHumidity();         // Datos de humedad.
-    misdatos.temp = dht.getTemperature();     // Datos de temperatura.
-    misdatos.bateria = ESP.getVcc();          // Medimos la alimentación de la placa.
+    misdatos.hum = dht.getHumidity();        // Datos de humedad.
+    misdatos.temp = dht.getTemperature();    // Datos de temperatura.
+    misdatos.bateria = ESP.getVcc();         // Medimos la alimentación de la placa.
    
     // Actualizamos datos de conexión.
-    sprintf(misdatos.SSId, ssid);           // Datos del ssid.
+    sprintf(misdatos.SSId, ssid);            // Datos del ssid.
     misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
     misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
    
@@ -544,8 +609,25 @@ void loop() {
     misdatos.valor_switch = Switch_status;
     
     // Generamos el mensaje JSON:
-    String msg_JSON=serializa_JSON(misdatos);
+    String msg_JSON;
+    StaticJsonDocument<256> jsonRoot;
+    
+    jsonRoot["CHIPID"]=misdatos.chipid;
+    jsonRoot["Uptime"]= misdatos.tiempo;
+    jsonRoot["Vcc"]=misdatos.bateria;
+    JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
+    DHT11["Temperatura"] = misdatos.temp;
+    DHT11["Humedad"] = misdatos.hum;
+    jsonRoot["LED"]=misdatos.valor_led;
+    jsonRoot["SWITCH"]=misdatos.valor_switch;
+    JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
+    Wifi["SSID"]=misdatos.SSId;
+    Wifi["IP"]=misdatos.ip;
+    Wifi["RSSI"]=misdatos.rssi;
+    serializeJson(jsonRoot,msg_JSON);
+    
     strcpy(msg_datos,msg_JSON.c_str());
+    
     Serial.print("Mensaje JSON de datos: ");
     Serial.println(msg_datos); 
     //Se publica el mensaje en el topic correspondiente
