@@ -1,70 +1,4 @@
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include "DHTesp.h"
-#include <ESP8266httpUpdate.h>
-#include <ArduinoJson.h>
-#include "Button2.h"
-
-//--------------DEFINICION VARIABLES--------------------------
-//Datos para actualización OTA:
-#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
-#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
-#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
-#define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
-
-//Funciones para progreso de OTA
-void progreso_OTA(int,int);
-void final_OTA();
-void inicio_OTA();
-void error_OTA(int);
-unsigned long lastAct=0;
-
-
-//Datos sensor y estructura de datos
-DHTesp dht;           // Objeto sensor
-ADC_MODE(ADC_VCC);    // Función para poder medir la alimentación de la placa.
-
-struct registro_datos    //Definimos una estructura de datos para guardar todos los datos que queremos enviar
-     {unsigned long tiempo;   
-      float temp;
-      float hum;
-      float bateria;
-      int valor_led;
-      int valor_switch;
-      char chipid[16];
-      char SSId[16];
-      int32_t rssi;
-      IPAddress ip;
-};
-
-
-// GPIOs 
-int LED1 = 2;         //Pin del LED PWM
-int LED2 = 16;        //Pin del LED interruptor
-int LED_OTA = 2;      //Pin del LED usado durante la actualización FOTA
-int SENSOR = 5;       //Pin de datos del sensor
-
-//Variables de led:
-char ID_PLACA[16];        // Cadenas para ID de la placa
-int PWM_status;           // Variable que indica estado del LED1
-int valor_anterior=-1;    // Variable guarda valor PWM para funcion del boton
-int Switch_status;        // Variable que indica estado del LED2
-
-//Variables de configuración
-int vel_envio=30;
-int vel_fota=0;
-int vel_PWM;
-int LED_logica=0;
-int SWITCH_logica=0;
-
-//Variables botones
-#define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
-Button2 button;         // Objeto de la cabecera button2.h
-char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
-
-// Datos para conectar a WIFI
-const char* ssid = "infind";                // Usuario del punto de acceso.
-const char* password = "1518wifi";          // Contraseña del punto de acceso.
+const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
 const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
@@ -229,10 +163,20 @@ void released(Button2& btn) {     // Se llama cuando se libera el boton
     Serial.print("released: ");
     Serial.println(btn.wasPressedFor());
 }
-void click(Button2& btn) {
+void click(Button2& btn) {  //Simple click: Apaga LED PWM/ Enciende a último valor
     Serial.println("click\n");
     sprintf(tipo_pulsacion, "simpleclick");
-    //tipo_pulsacion="simpleclick";
+    //Apagamos/Encendemos el LED1:
+    if (PWM_status<255){
+      PWM_anterior = PWM_status;
+      PWM_status=255;  // Se apaga el LED2 
+      analogWrite(LED1,PWM_status); // Escribe el valor calculado
+    }
+    else{
+      PWM_status=PWM_anterior;
+      analogWrite(LED1,PWM_anterior); //Ponemos la intensidad del LED al ultimo valor registrado
+    }
+    pub_msg_led(PWM_status); //Llamamos funcion manda mensaje de actualizacion del LED1   
 }
 void longClickDetected(Button2& btn) {
     Serial.println("long click detected\n");
@@ -240,14 +184,32 @@ void longClickDetected(Button2& btn) {
 void longClick(Button2& btn) {
     Serial.println("long click\n");
     sprintf(tipo_pulsacion, "longclick");
-   // tipo_pulsacion="longclick";
+    //Actualizacion FOTA
+    lastAct=millis();
+    intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
 }
 void doubleClick(Button2& btn) {
     Serial.println("double click\n");
     sprintf(tipo_pulsacion, "doubleclick");
-   // tipo_pulsacion="doubleclick";
+    //LED1 a nivel máximo:
+    PWM_anterior = PWM_status;
+    PWM_status=0;
+    analogWrite(LED1,PWM_status); // Actualizamos su valor
+    pub_msg_led(PWM_status);          //Llamamos funcion manda mensaje de actualizacion del LED1 
 }
-
+void pub_msg_led(int PWM_status) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
+    // Genera mensaje para publicar
+    StaticJsonDocument<96> doc;
+    doc["CHIPID"] = ID_PLACA;
+    doc["LED"] = PWM_status;
+    doc["origen"] = "pulsador";
+    serializeJson(doc, msg_led);
+    //Mostramos mensaje:
+    Serial.print("Mensaje de confirmación de intensidad: ");
+    Serial.println(msg_led);
+    // Publicamos mensaje     
+    client.publish(topic_led_status, msg_led);
+}
 //-------------------PROCESAR MENSAJES----------------------------
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   
@@ -300,8 +262,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
     //Variables para operar:
     int PWM_led;  // Guarda contenido del campo "level" del mensaje 
-    int PWM;      // Variable para el control del LED1
-    char id;      // Guarda el identificador del mensaje
+    int id;     // Guarda el identificador del mensaje
     
     // Compruebo si no hubo error
     if (error) {
@@ -314,20 +275,41 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];            // Se guarda el contenido del campo "id"
-        
+
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
         
         // Cambio de escala de [0,100] a [0,255]:
         if(LED_logica==0){                     
-        PWM = 255 - PWM_led*(255/100);         // Logica inversa
+        PWM_status = 255 - PWM_led*(255/100);         // Logica inversa
         }                                      
         else{
-        PWM=PWM_led*(255/100);                // Logica directa
+        PWM_status=PWM_led*(255/100);                // Logica directa
         }
+        analogWrite(LED1,PWM_status);    // Escribimos en el LED1 el valor de PWM.
         
-        analogWrite(LED1,PWM);    // Escribimos en el LED1 el valor de PWM.
+        // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
+         if(PWM_anterior != PWM_status)
+         {
+          // Genera mensaje para publicar
+          StaticJsonDocument<128> doc;
+
+          doc["CHIPID"] = ID_PLACA;
+          doc["LED"] = PWM_status;
+          doc["origen"] = "mqtt";
+          doc["id"] = id;
+
+          serializeJson(doc, msg_led);
+         // snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":\"%s\",\"LED\": %d,\"origen\":mqtt,\"id\":%d}",ID_PLACA, PWM_status,id);
+          Serial.print("Mensaje de confirmación de intensidad: ");
+          Serial.println(msg_led);
+      
+          // Publicamos mensaje     
+          client.publish(topic_led_status, msg_led);
+    
+          PWM_anterior = PWM_status; // Guarda nuevo valor en la variable global
+         }        
       }
       else  // En el mensaje no existe el campo "level"
       {
@@ -346,8 +328,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
     //Variables para operar:
      int Switch_led; // Guarda contenido del campo "level" del mensaje
-     bool SWITCH;    // Variable para el control del LED1
-     char id;        // Guarda el identificador del mensaje
+     int id;        // Guarda el identificador del mensaje
      
     // Compruebo si no hubo error
     if (error) {
@@ -367,26 +348,32 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
 
         // Se configura la salida en función del tipo de logica que se aplique
         if(SWITCH_logica==0){       // Logica inversa
-        SWITCH = not(Switch_led); 
+          if(Switch_led==1) {Switch_status=HIGH;}
+          else{Switch_status=LOW;} 
         }
         else{                       // Logica directa
-        SWITCH = Switch_led;
+          if(Switch_led==1){Switch_status=LOW;}
+          else{Switch_status=HIGH;} 
         }
         
-        digitalWrite(LED2,SWITCH);    // Escribimos en el LED2 el valor de SWITCH                                        
-
-        // Cuando cambie el valor de la intensidad del led, enviamos un mensaje.
-        if(Switch_led != Switch_status)
-        {
+        digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de SWITCH                                        
+        if(Switch_anterior!=Switch_status){
           // Genera mensaje para publicar
-          snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"SWITCH\": %d,\"origen\":mqtt,\"id\":%s}",ID_PLACA, Switch_led,id); 
+          StaticJsonDocument<128> doc;
+          doc["CHIPID"] = ID_PLACA;
+          doc["SWITCH"] = Switch_status;
+          doc["origen"] = "mqtt";
+          doc["id"] = id;
+          serializeJson(doc, msg_led);
+          
+          //Mostramos el mensaje
           Serial.print("Mensaje de confirmación de intensidad: ");
           Serial.println(msg_led);
   
           // Publicamos mensaje     
           client.publish(topic_switch_status, msg_led);
 
-          Switch_status = Switch_led;   // Guarda nuevo valor en la variable global
+          Switch_anterior = Switch_status;   // Guarda nuevo valor en la variable global
         }
       }
       else  // En el mensaje no existe el campo "level"
@@ -437,6 +424,10 @@ void setup() {
 
   digitalWrite(LED1, HIGH);   // Inicialmente el LED1 está apagado. Tambien se corresponde con LED_OTA
   digitalWrite(LED2, HIGH);   // Inicialmente el LED2 está apagado.
+  // Inicializa variables controlan LEDs
+  PWM_status=HIGH;
+  PWM_anterior=HIGH;
+  Switch_status=HIGH;
   
   Serial.begin(115200);       // Establecemos la velocidad del puerto serie
   
@@ -474,7 +465,7 @@ void setup() {
   sprintf(topic_config, "II12/%s/config",ID_PLACA);
   sprintf(topic_led_cmd, "II12/%s/led/cmd",ID_PLACA);
   sprintf(topic_led_status, "II12/%s/led/status",ID_PLACA);
-  sprintf(topic_switch_cmd, "II12/%s/swithc/cmd",ID_PLACA);
+  sprintf(topic_switch_cmd, "II12/%s/switch/cmd",ID_PLACA);
   sprintf(topic_switch_status, "II12/%s/switch/status",ID_PLACA);
   sprintf(topic_fota, "II12/%s/FOTA",ID_PLACA);
   
@@ -492,7 +483,7 @@ String serializa_JSON (struct registro_datos datos)
   jsonRoot["Vcc"]=datos.bateria;
   JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
   DHT11["Temperatura"] = datos.temp;
-  DHT11["Hunedad"] = datos.hum;
+  DHT11["Humedad"] = datos.hum;
   jsonRoot["LED"]=datos.valor_led;
   jsonRoot["SWITCH"]=datos.valor_switch;
   JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
@@ -528,8 +519,12 @@ void loop() {
     lastAct=misdatos.tiempo;
     intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
    }
+
+  
+  // Loop del boton:
+    button.loop();             // Llamamos a la funcion del boton
     
-    // Manda mensaje de datos, si se supera el tiempo vel_envio
+  // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
     lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
 
@@ -553,46 +548,7 @@ void loop() {
     strcpy(msg_datos,msg_JSON.c_str());
     Serial.print("Mensaje JSON de datos: ");
     Serial.println(msg_datos); 
-
-    client.publish(topic_datos, msg_datos);   //Se publica el mensaje en el topic correspondiente
-  }
-
-  // Función del boton:
-    button.loop();             // Llamamos a la funcion del boton
-    int PWM_led=PWM_status;    // Variable controla intensidad del LED
-    
-    if(strcmp(tipo_pulsacion,"simpleclick")){
-          if (PWM_status>0){ 
-            PWM_led=255;  // Se apaga el LED2
-            valor_anterior = PWM_status;
-          }
-          else{
-             PWM_led=valor_anterior;
-             analogWrite(LED1,valor_anterior); //ponemos la intensidad del LED al ultimo valor del slider
-          }
-    }
-    else if(strcmp(tipo_pulsacion,"doubleclick")){
-          PWM_led=0;  // LED2 a nivel máximo
-    }
-    else if(strcmp(tipo_pulsacion,"longclick")){
-          lastAct=millis();
-          intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
-    }
-    
-    analogWrite(LED1,PWM_led); // Escribe el valor calculado
-        
-    // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
-     if(PWM_led != PWM_status)
-     {
-      // Genera mensaje para publicar
-      snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"LED\": %d,\"origen\":pulsador}",ID_PLACA, PWM_led); 
-      Serial.print("Mensaje de confirmación de intensidad: ");
-      Serial.println(msg_led);
-  
-      // Publicamos mensaje     
-      client.publish(topic_led_status, msg_led);
-
-      PWM_status = PWM_led; // Guarda nuevo valor en la variable global
-     }
-    
+    //Se publica el mensaje en el topic correspondiente
+    client.publish(topic_datos, msg_datos);  
+  }    
 }
