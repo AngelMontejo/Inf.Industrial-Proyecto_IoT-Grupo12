@@ -64,8 +64,8 @@ Button2 button;         // Objeto de la cabecera button2.h
 char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
-const char* ssid = "MIWIFI_E32g";                // Usuario del punto de acceso.
-const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
+const char* ssid = "infind";                // Usuario del punto de acceso.
+const char* password = "1518wifi";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
 const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
@@ -268,6 +268,7 @@ void pub_msg_led(int PWM_status) {    //Funcion genera y publica mensaje de actu
     // Genera mensaje para publicar
     StaticJsonDocument<96> doc;
     doc["CHIPID"] = ID_PLACA;
+    doc["Polaridad"]=LED_logica;
     doc["LED"] = PWM_status;
     doc["origen"] = "pulsador";
     serializeJson(doc, msg_led);
@@ -362,12 +363,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           StaticJsonDocument<128> doc;
 
           doc["CHIPID"] = ID_PLACA;
+          doc["Polaridad"]=LED_logica;
           doc["LED"] = PWM_status;
           doc["origen"] = "mqtt";
           doc["id"] = id;
-
           serializeJson(doc, msg_led);
-         // snprintf (msg_led, MSG_BUFFER_SIZE, "{\"CHIPID\":\"%s\",\"LED\": %d,\"origen\":mqtt,\"id\":%d}",ID_PLACA, PWM_status,id);
+       
           Serial.print("Mensaje de confirmación de intensidad: ");
           Serial.println(msg_led);
       
@@ -427,6 +428,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           // Genera mensaje para publicar
           StaticJsonDocument<128> doc;
           doc["CHIPID"] = ID_PLACA;
+          doc["Polaridad"]=SWITCH_logica;
           doc["SWITCH"] = Switch_status;
           doc["origen"] = "mqtt";
           doc["id"] = id;
@@ -526,7 +528,7 @@ void setup() {
 
   
   // Definimos los topics que vamos a usar:
-  sprintf(topic_conexion, "infind/II12/%s/conexion",ID_PLACA);
+  sprintf(topic_conexion, "II12/%s/conexion",ID_PLACA);
   sprintf(topic_datos, "II12/%s/datos",ID_PLACA);
   sprintf(topic_config, "II12/%s/config",ID_PLACA);
   sprintf(topic_led_cmd, "II12/%s/led/cmd",ID_PLACA);
@@ -538,29 +540,6 @@ void setup() {
  
 }
 
-//---------------------SERIALIZA JSON---------------------
-String serializa_JSON (struct registro_datos datos)
-{
-  StaticJsonDocument<256> jsonRoot;
-  String jsonString;
-  Serial.println(datos.ip);
-  jsonRoot["CHIPID"]=datos.chipid;
-  jsonRoot["Uptime"]= datos.tiempo;
-  jsonRoot["Vcc"]=datos.bateria;
-  JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
-  DHT11["Temperatura"] = datos.temp;
-  DHT11["Humedad"] = datos.hum;
-  jsonRoot["LED"]=datos.valor_led;
-  jsonRoot["SWITCH"]=datos.valor_switch;
-  JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
-  Wifi["SSID"]=datos.SSId;
-  Wifi["IP"]=datos.ip.toString().c_str();
-  Wifi["RSSI"]=datos.rssi;
-  
-  
-  serializeJson(jsonRoot,jsonString);
-  return jsonString;
-}
 //-------------------------MAIN-------------------------------
 
 void loop() {
