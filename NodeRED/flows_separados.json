@@ -12454,15 +12454,6 @@
         "sessionExpiry": ""
     },
     {
-        "id": "eb3cf59794dcabf3",
-        "type": "ui_tab",
-        "name": "Tarea 2. Interpretación de mensajes JSON",
-        "icon": "dashboard",
-        "order": 2,
-        "disabled": false,
-        "hidden": false
-    },
-    {
         "id": "43e4d3e7.b408bc",
         "type": "noraf-light",
         "z": "1aa414b814253134",
@@ -12671,7 +12662,7 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "var level=flow.get(\"ledlevel\")\nmsg.payload={\"level\":level}\nreturn msg;",
+        "func": "var level=global.get(\"ledlevel\")\nmsg.payload={\"level\":level}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -12752,7 +12743,7 @@
         "max": "100",
         "step": "10",
         "className": "",
-        "x": 470,
+        "x": 450,
         "y": 480,
         "wires": [
             [
@@ -12838,7 +12829,7 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "var envia=flow.get(\"envia\")\nvar actualiza=flow.get(\"actualiza\")\nvar velocidad=flow.get(\"velocidad\")\nvar led=flow.get(\"led\")\nvar switches=flow.get(\"switches\")\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n    msg.payload={\"envia\":envia,\"actualiza\":actualiza,\"velocidad\":velocidad,\"led\":led,\"switch\":switches}\n//}\nreturn msg;",
+        "func": "var envia=global.get(\"envia\")\nvar actualiza=global.get(\"actualiza\")\nvar velocidad=global.get(\"velocidad\")\nvar led=global.get(\"led\")\nvar switches=global.get(\"switches\")\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n    msg.payload={\"envia\":envia,\"actualiza\":actualiza,\"velocidad\":velocidad,\"led\":led,\"switch\":switches}\n//}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -12937,7 +12928,7 @@
             {
                 "t": "set",
                 "p": "led",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -12964,7 +12955,7 @@
             {
                 "t": "set",
                 "p": "switches",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -12974,7 +12965,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 430,
+        "x": 390,
         "y": 1040,
         "wires": [
             [
@@ -13103,14 +13094,14 @@
             {
                 "t": "set",
                 "p": "ledlevel",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             },
             {
                 "t": "set",
                 "p": "origen",
-                "pt": "flow",
+                "pt": "global",
                 "to": "mqtt",
                 "tot": "str"
             }
@@ -13131,7 +13122,7 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "//var level=flow.get(\"led\")\nvar level=msg.payload\nvar id=flow.get(\"ChipID\")\nvar polaridad=flow.get(\"polaridad\")\nmsg.payload={\"level\":level, \"id\":id, \"polaridad\":polaridad}\nreturn msg;",
+        "func": "var level=msg.payload\nvar id=global.get(\"ChipID\")\nvar polaridad=global.get(\"polaridad\")\nmsg.payload={\"level\":level, \"id\":id, \"polaridad\":polaridad}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -13228,7 +13219,7 @@
         "correl": "",
         "expiry": "",
         "broker": "c8031eb74c5057fd",
-        "x": 940,
+        "x": 900,
         "y": 1040,
         "wires": []
     },
@@ -13245,7 +13236,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 880,
+        "x": 840,
         "y": 1100,
         "wires": []
     },
@@ -13254,13 +13245,13 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "var level=flow.get(\"switches\")\nvar id=flow.get(\"ChipID\")\nvar polaridad=flow.get(\"polaridad\")\nmsg.payload={\"level\":level, \"id\":id, \"polaridad\":polaridad}\nreturn msg;",
+        "func": "var level=global.get(\"switches\")\nvar id=global.get(\"ChipID\")\nvar polaridad=global.get(\"polaridad\")\nmsg.payload={\"level\":level, \"id\":id, \"polaridad\":polaridad}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
+        "x": 620,
         "y": 1040,
         "wires": [
             [
@@ -13278,7 +13269,7 @@
             {
                 "t": "set",
                 "p": "polaridad",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -13288,7 +13279,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 690,
+        "x": 650,
         "y": 1260,
         "wires": [
             [
@@ -13398,7 +13389,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 870,
+        "x": 850,
         "y": 1260,
         "wires": []
     },
@@ -14685,7 +14676,7 @@
         "wires": [
             [
                 "db7b6c0b8f810e42",
-                "cdf9a7f9c373cc0d"
+                "7de2d48131290e71"
             ]
         ]
     },
@@ -14730,7 +14721,7 @@
         "wires": [
             [
                 "2ff46e8be29e9b51",
-                "da0201b6fdbc1e6b"
+                "bd16e774c4ee0147"
             ]
         ]
     },
@@ -14775,7 +14766,7 @@
         "wires": [
             [
                 "56f71c07b1a280c5",
-                "61b8ef5fdaee5d21"
+                "d189d65e167431a1"
             ]
         ]
     },
@@ -14876,7 +14867,7 @@
         "wires": [
             [
                 "6928862e4673a727",
-                "f5fe6777aaebf1a7"
+                "8ed2799947491f29"
             ]
         ]
     },
@@ -15037,7 +15028,7 @@
             {
                 "t": "set",
                 "p": "vcc",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -15047,7 +15038,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 990,
+        "x": 1000,
         "y": 420,
         "wires": [
             [
@@ -15064,7 +15055,7 @@
             {
                 "t": "set",
                 "p": "temp",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -15074,7 +15065,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 990,
+        "x": 1000,
         "y": 520,
         "wires": [
             [
@@ -15091,34 +15082,7 @@
             {
                 "t": "set",
                 "p": "hum",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 990,
-        "y": 620,
-        "wires": [
-            [
-                "65144aea8508aaee"
-            ]
-        ]
-    },
-    {
-        "id": "f5fe6777aaebf1a7",
-        "type": "change",
-        "z": "6ce89d6d30dc0da6",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "uptime",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -15129,84 +15093,11 @@
         "to": "",
         "reg": false,
         "x": 1000,
-        "y": 720,
+        "y": 620,
         "wires": [
-            []
-        ]
-    },
-    {
-        "id": "cdf9a7f9c373cc0d",
-        "type": "change",
-        "z": "6ce89d6d30dc0da6",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "rssi",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 990,
-        "y": 820,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "da0201b6fdbc1e6b",
-        "type": "change",
-        "z": "6ce89d6d30dc0da6",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "ssid",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 990,
-        "y": 920,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "61b8ef5fdaee5d21",
-        "type": "change",
-        "z": "6ce89d6d30dc0da6",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "ip",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 980,
-        "y": 1020,
-        "wires": [
-            []
+            [
+                "65144aea8508aaee"
+            ]
         ]
     },
     {
@@ -15222,7 +15113,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 390,
+        "x": 370,
         "y": 860,
         "wires": []
     },
@@ -15269,7 +15160,7 @@
             {
                 "t": "set",
                 "p": "ChipID",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload.CHIPID",
                 "tot": "msg"
             }
@@ -15279,7 +15170,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 800,
+        "x": 810,
         "y": 180,
         "wires": [
             []
@@ -15349,7 +15240,7 @@
         "type": "function",
         "z": "7384551733ad4fe7",
         "name": "mensaje respuesta",
-        "func": "var envia=flow.get(\"envia\").toString()\nvar actualiza=flow.get(\"actualiza\").toString()\nvar velocidad=flow.get(\"velocidad\").toString()\nvar led=flow.get(\"led\").toString()\nvar switches=flow.get(\"switches\").toString()\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n    msg.payload.content=\"Información: \\nenvia: \" +envia+\"\\nactualiza: \"+actualiza+\"\\nvelocidad: \"+velocidad+\"\\nled: \"+led+\"\\nswitch: \"+switches;\n//}\n\nreturn msg;",
+        "func": "var envia=global.get(\"envia\").toString()\nvar actualiza=global.get(\"actualiza\").toString()\nvar velocidad=global.get(\"velocidad\").toString()\nvar led=global.get(\"led\").toString()\nvar switches=global.get(\"switches\").toString()\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n    msg.payload.content=\"Información: \\nenvia: \" +envia+\"\\nactualiza: \"+actualiza+\"\\nvelocidad: \"+velocidad+\"\\nled: \"+led+\"\\nswitch: \"+switches;\n//}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -15368,7 +15259,7 @@
         "type": "function",
         "z": "7384551733ad4fe7",
         "name": "mensaje respuesta",
-        "func": "var vcc=flow.get(\"vcc\")\nvar temp=flow.get(\"temp\")\nvar hum=flow.get(\"hum\")\nvar uptime=flow.get(\"uptime\")\nvar rssi=flow.get(\"rssi\")\nvar ssid=flow.get(\"ssid\")\nvar ip=flow.get(\"ip\")\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n   msg.payload.content=\"Datos: \\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\n//}\n\nreturn msg;",
+        "func": "var vcc=global.get(\"vcc\")\nvar temp=global.get(\"temp\")\nvar hum=global.get(\"hum\")\nvar uptime=global.get(\"uptime\")\nvar rssi=global.get(\"rssi\")\nvar ssid=global.get(\"ssid\")\nvar ip=global.get(\"ip\")\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n   msg.payload.content=\"Datos: \\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\n//}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -15387,7 +15278,7 @@
         "type": "function",
         "z": "7384551733ad4fe7",
         "name": "mensaje respuesta",
-        "func": "var ledlevel=flow.get(\"ledlevel\")\n//if (enviado==true){\n    msg.payload.content=\"Nivel del led: \" +ledlevel;\n//}\n\nreturn msg;",
+        "func": "var ledlevel=global.get(\"ledlevel\")\n//if (enviado==true){\n    msg.payload.content=\"Nivel del led: \" +ledlevel;\n//}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -15655,7 +15546,7 @@
         "type": "function",
         "z": "7384551733ad4fe7",
         "name": "mensaje respuesta",
-        "func": "if (flow.get(\"switches\")===true)\n{\n    msg.payload.content=\"Switch apagado\"\n    msg.payload.sw=false;\n}\nelse if (flow.get(\"switches\")===false)\n{\n    msg.payload.content=\"Switch encendido\"\n    msg.payload.sw=true;\n}\nreturn msg;\n",
+        "func": "if (global.get(\"switches\")===true)\n{\n    msg.payload.content=\"Switch apagado\"\n    msg.payload.sw=false;\n}\nelse if (flow.get(\"switches\")===false)\n{\n    msg.payload.content=\"Switch encendido\"\n    msg.payload.sw=true;\n}\nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -15827,7 +15718,7 @@
         "type": "ui_text_input",
         "z": "95dbb5218f62330d",
         "name": "",
-        "label": "",
+        "label": "Consulta",
         "tooltip": "",
         "group": "e8ac12aa380cb87f",
         "order": 0,
@@ -15856,7 +15747,7 @@
             {
                 "t": "set",
                 "p": "consulta",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -15866,7 +15757,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 620,
+        "x": 630,
         "y": 400,
         "wires": [
             []
@@ -16049,7 +15940,7 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "msg.payload.origen=flow.get(\"origen\")\nreturn msg;\n",
+        "func": "msg.payload.origen=global.get(\"origen\")\nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -16176,7 +16067,7 @@
         "type": "function",
         "z": "a93d1421fe1c9696",
         "name": "",
-        "func": "var fecha = new Date (msg.payload);\n\nmsg.payload = fecha.toLocaleString(\"es-ES\",{\"timeZone\": \"Europe/Madrid\"});\n\nreturn msg;",
+        "func": "var fecha = new Date (msg.payload);\n\nmsg.global = fecha.toLocaleString(\"es-ES\",{\"timeZone\": \"Europe/Madrid\"});\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -16293,6 +16184,106 @@
         "className": "",
         "x": 1280,
         "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8ed2799947491f29",
+        "type": "change",
+        "z": "6ce89d6d30dc0da6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "uptime",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7de2d48131290e71",
+        "type": "change",
+        "z": "6ce89d6d30dc0da6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rssi",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1000,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bd16e774c4ee0147",
+        "type": "change",
+        "z": "6ce89d6d30dc0da6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ssid",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1000,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d189d65e167431a1",
+        "type": "change",
+        "z": "6ce89d6d30dc0da6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ip",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 990,
+        "y": 1020,
         "wires": [
             []
         ]
