@@ -1,0 +1,474 @@
+[
+    {
+        "id": "95dbb5218f62330d",
+        "type": "tab",
+        "label": "MONGODB",
+        "disabled": true,
+        "info": ""
+    },
+    {
+        "id": "f726e739a35227ea",
+        "type": "mqtt in",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "topic": "II12/+/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "ebd37a1ff0712904"
+            ]
+        ]
+    },
+    {
+        "id": "9f7b427b0e1b5850",
+        "type": "mqtt in",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "topic": "II12/+/switch/status",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "85ee818eae466ca0"
+            ]
+        ]
+    },
+    {
+        "id": "c096d4a71d213d45",
+        "type": "mqtt in",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "topic": "II12/+/led/status",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 160,
+        "y": 260,
+        "wires": [
+            [
+                "3a54d64adca74562"
+            ]
+        ]
+    },
+    {
+        "id": "6c9273f6512a24a6",
+        "type": "ui_text_input",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "label": "Consulta",
+        "tooltip": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "5",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "topicType": "msg",
+        "x": 420,
+        "y": 380,
+        "wires": [
+            [
+                "d722297681b05967"
+            ]
+        ]
+    },
+    {
+        "id": "d722297681b05967",
+        "type": "change",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "consulta",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6cb251686aa0aef",
+        "type": "function",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "func": "// Guardamos el contenido del dashboard en una variable.\nvar consulta = global.get(\"consulta\")\n\nmsg.payload = {}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 500,
+        "wires": [
+            [
+                "6bdf9e46b14a6946"
+            ]
+        ]
+    },
+    {
+        "id": "6bdf9e46b14a6946",
+        "type": "mongodb in",
+        "z": "95dbb5218f62330d",
+        "mongodb": "c4d4bcf45ac11236",
+        "name": "",
+        "collection": "PruebasGrupo12",
+        "operation": "find",
+        "x": 620,
+        "y": 500,
+        "wires": [
+            [
+                "1c78b07d1bda352a"
+            ]
+        ]
+    },
+    {
+        "id": "1c78b07d1bda352a",
+        "type": "debug",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "0937a7a64e2b8cf6",
+        "type": "comment",
+        "z": "95dbb5218f62330d",
+        "name": "consulta desde dashboard",
+        "info": "",
+        "x": 350,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "6019cfe9b1de054b",
+        "type": "inject",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 170,
+        "y": 500,
+        "wires": [
+            [
+                "a6cb251686aa0aef"
+            ]
+        ]
+    },
+    {
+        "id": "17189d34db4d8747",
+        "type": "ui_dropdown",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "label": "Seleccione fecha a recuperar",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "e8ac12aa380cb87f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "Ultima Hora",
+                "value": "hola",
+                "type": "str"
+            },
+            {
+                "label": "Ultimo Dia",
+                "value": "casa",
+                "type": "str"
+            },
+            {
+                "label": "Ultima Semana",
+                "value": "coche",
+                "type": "str"
+            },
+            {
+                "label": "Ultimo Mes",
+                "value": "perro",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 470,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "85ee818eae466ca0",
+        "type": "json",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "1ebe74e49f12f926"
+            ]
+        ]
+    },
+    {
+        "id": "94720631a66ba5b2",
+        "type": "function",
+        "z": "95dbb5218f62330d",
+        "name": "payload + fecha",
+        "func": "// Vamos a añadir a cada dato la fecha a la que ha sido recibido.\n\nmsg.payload.led.date = new Date();\nmsg.payload.switch.date = new Date();\nmsg.payload.datos.date = new Date();\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 180,
+        "wires": [
+            [
+                "514216aa14ef7030"
+            ]
+        ]
+    },
+    {
+        "id": "514216aa14ef7030",
+        "type": "mongodb out",
+        "z": "95dbb5218f62330d",
+        "mongodb": "c4d4bcf45ac11236",
+        "name": "",
+        "collection": "PruebasGrupo12",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 1070,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ebd37a1ff0712904",
+        "type": "json",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 100,
+        "wires": [
+            [
+                "20c6c39cb10c4080"
+            ]
+        ]
+    },
+    {
+        "id": "3a54d64adca74562",
+        "type": "json",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 330,
+        "y": 260,
+        "wires": [
+            [
+                "cef07db237e0238f"
+            ]
+        ]
+    },
+    {
+        "id": "20c6c39cb10c4080",
+        "type": "change",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.datos",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 100,
+        "wires": [
+            [
+                "94720631a66ba5b2"
+            ]
+        ]
+    },
+    {
+        "id": "1ebe74e49f12f926",
+        "type": "change",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.switch",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 530,
+        "y": 180,
+        "wires": [
+            [
+                "94720631a66ba5b2"
+            ]
+        ]
+    },
+    {
+        "id": "cef07db237e0238f",
+        "type": "change",
+        "z": "95dbb5218f62330d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.led",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 260,
+        "wires": [
+            [
+                "94720631a66ba5b2"
+            ]
+        ]
+    },
+    {
+        "id": "759329fc13f505d4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e8ac12aa380cb87f",
+        "type": "ui_group",
+        "name": "Consultas",
+        "tab": "0c21156c55c19a41",
+        "order": 1,
+        "disp": true,
+        "width": "9",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c4d4bcf45ac11236",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "ejemplo",
+        "name": ""
+    },
+    {
+        "id": "0c21156c55c19a41",
+        "type": "ui_tab",
+        "name": "Base de Datos",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
