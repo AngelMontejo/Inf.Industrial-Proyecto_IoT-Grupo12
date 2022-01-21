@@ -20,8 +20,8 @@
         "correl": "",
         "expiry": "",
         "broker": "759329fc13f505d4",
-        "x": 570,
-        "y": 1020,
+        "x": 1410,
+        "y": 1120,
         "wires": []
     },
     {
@@ -44,8 +44,8 @@
         "max": "100",
         "step": "10",
         "className": "",
-        "x": 450,
-        "y": 480,
+        "x": 590,
+        "y": 600,
         "wires": [
             [
                 "862a4d340e451143"
@@ -72,8 +72,8 @@
         "max": "500",
         "step": "25",
         "className": "",
-        "x": 430,
-        "y": 420,
+        "x": 570,
+        "y": 540,
         "wires": [
             [
                 "6678ca1d211c6063"
@@ -100,8 +100,8 @@
         "max": "20",
         "step": 1,
         "className": "",
-        "x": 410,
-        "y": 540,
+        "x": 550,
+        "y": 660,
         "wires": [
             [
                 "cad09707ca461af3"
@@ -121,8 +121,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 580,
-        "y": 1080,
+        "x": 1420,
+        "y": 1200,
         "wires": []
     },
     {
@@ -130,14 +130,14 @@
         "type": "function",
         "z": "c5b211326b86063d",
         "name": "",
-        "func": "var envia=global.get(\"envia\")\nvar actualiza=global.get(\"actualiza\")\nvar velocidad=global.get(\"velocidad\")\nvar led=global.get(\"polaridad\")\nvar switches=global.get(\"polaridad\")\nvar idplaca=global.get(\"ChipID\")\nmsg.topic=\"II12/\"+idplaca+\"/config\"\n\nmsg.payload={\"envia\":envia,\"actualiza\":actualiza,\"velocidad\":velocidad,\"LED\":led,\"SWITCH\":switches}\n\n\nreturn msg;",
+        "func": "var envia=global.get(\"envia\")\nvar actualiza=global.get(\"actualiza\")\nvar velocidad=global.get(\"velocidad\")\nvar led=global.get(\"polaridadl\")\nvar switches=global.get(\"polaridads\")\nvar idplaca=global.get(\"ChipID\")\nmsg.topic=\"II12/\"+idplaca+\"/config\"\n\nmsg.payload={\"envia\":envia,\"actualiza\":actualiza,\"velocidad\":velocidad,\"LED\":led,\"SWITCH\":switches}\n\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 400,
-        "y": 1020,
+        "x": 1240,
+        "y": 1120,
         "wires": [
             [
                 "7742291a6fc4fd1f",
@@ -154,7 +154,7 @@
             {
                 "t": "set",
                 "p": "envia",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -164,10 +164,13 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 720,
-        "y": 420,
+        "x": 880,
+        "y": 540,
         "wires": [
-            []
+            [
+                "6fc7108801906565",
+                "69f9b61ae08a17c6"
+            ]
         ]
     },
     {
@@ -179,7 +182,7 @@
             {
                 "t": "set",
                 "p": "actualiza",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -189,10 +192,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 730,
-        "y": 480,
+        "x": 830,
+        "y": 600,
         "wires": [
-            []
+            [
+                "6fc7108801906565"
+            ]
         ]
     },
     {
@@ -204,7 +209,7 @@
             {
                 "t": "set",
                 "p": "velocidad",
-                "pt": "flow",
+                "pt": "global",
                 "to": "payload",
                 "tot": "msg"
             }
@@ -214,10 +219,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 730,
-        "y": 540,
+        "x": 770,
+        "y": 660,
         "wires": [
-            []
+            [
+                "6fc7108801906565"
+            ]
         ]
     },
     {
@@ -270,8 +277,8 @@
         "topic": "",
         "payload": "{ }",
         "payloadType": "json",
-        "x": 190,
-        "y": 540,
+        "x": 330,
+        "y": 660,
         "wires": [
             [
                 "8dfa42285029ba09",
@@ -288,7 +295,7 @@
         "rules": [
             {
                 "t": "set",
-                "p": "polaridad",
+                "p": "polaridadl",
                 "pt": "global",
                 "to": "payload",
                 "tot": "msg"
@@ -299,11 +306,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 630,
+        "x": 640,
         "y": 1400,
         "wires": [
             [
-                "d156ffc9e0bf73b1"
+                "d156ffc9e0bf73b1",
+                "6fc7108801906565"
             ]
         ]
     },
@@ -312,7 +320,7 @@
         "type": "ui_switch",
         "z": "c5b211326b86063d",
         "name": "",
-        "label": "Polaridad",
+        "label": "Polaridad LED",
         "tooltip": "",
         "group": "ec055c1548084946",
         "order": 2,
@@ -333,7 +341,7 @@
         "offcolor": "",
         "animate": false,
         "className": "",
-        "x": 160,
+        "x": 180,
         "y": 1400,
         "wires": [
             [
@@ -409,8 +417,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 830,
-        "y": 1400,
+        "x": 810,
+        "y": 1420,
         "wires": []
     },
     {
@@ -697,13 +705,12 @@
         "max": "100",
         "step": 1,
         "className": "",
-        "x": 190,
-        "y": 800,
+        "x": 150,
+        "y": 900,
         "wires": [
             [
                 "4334a7106248b2a4",
-                "d0037bafd7729845",
-                "6fc7108801906565"
+                "d0037bafd7729845"
             ]
         ]
     },
@@ -798,10 +805,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 440,
+        "x": 500,
         "y": 760,
         "wires": [
-            []
+            [
+                "6fc7108801906565"
+            ]
         ]
     },
     {
@@ -824,10 +833,11 @@
         "to": "",
         "reg": false,
         "x": 370,
-        "y": 1220,
+        "y": 1180,
         "wires": [
             [
-                "a64b23b60a216a32"
+                "a64b23b60a216a32",
+                "6fc7108801906565"
             ]
         ]
     },
@@ -857,12 +867,11 @@
         "offcolor": "",
         "animate": false,
         "className": "",
-        "x": 150,
-        "y": 1220,
+        "x": 130,
+        "y": 1140,
         "wires": [
             [
-                "e5e0b2d02a6b9339",
-                "6fc7108801906565"
+                "e5e0b2d02a6b9339"
             ]
         ]
     },
@@ -920,6 +929,157 @@
                 "32fd7d557f9be282"
             ]
         ]
+    },
+    {
+        "id": "969abe48d220e0b3",
+        "type": "change",
+        "z": "c5b211326b86063d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "polaridads",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 1600,
+        "wires": [
+            [
+                "cd35114763be2d25",
+                "6fc7108801906565"
+            ]
+        ]
+    },
+    {
+        "id": "3eeda0706799e604",
+        "type": "ui_switch",
+        "z": "c5b211326b86063d",
+        "name": "",
+        "label": "Polaridad SWITCH",
+        "tooltip": "",
+        "group": "ec055c1548084946",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 190,
+        "y": 1600,
+        "wires": [
+            [
+                "d28aaa1e90e5be84",
+                "10045e706759ce8e"
+            ]
+        ]
+    },
+    {
+        "id": "d28aaa1e90e5be84",
+        "type": "function",
+        "z": "c5b211326b86063d",
+        "name": "",
+        "func": "var p = msg.payload\nif(p==true)\n    msg.payload=1\nelse\n    msg.payload=0\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 1600,
+        "wires": [
+            [
+                "969abe48d220e0b3",
+                "6b876e537f4c92a9"
+            ]
+        ]
+    },
+    {
+        "id": "6b876e537f4c92a9",
+        "type": "debug",
+        "z": "c5b211326b86063d",
+        "name": "P2S",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "10045e706759ce8e",
+        "type": "debug",
+        "z": "c5b211326b86063d",
+        "name": "P1S",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 370,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "cd35114763be2d25",
+        "type": "debug",
+        "z": "c5b211326b86063d",
+        "name": "P3S",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 1600,
+        "wires": []
+    },
+    {
+        "id": "69f9b61ae08a17c6",
+        "type": "debug",
+        "z": "c5b211326b86063d",
+        "name": "ENVIA",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 460,
+        "wires": []
     },
     {
         "id": "759329fc13f505d4",
