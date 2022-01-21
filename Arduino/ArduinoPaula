@@ -306,8 +306,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         LED_logica = root["LED"];           // Logica del LED1
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
         
-        Serial.printf("Mensaje OK, nueva configuración. Velocidad de publicación %d, velocidad de actualización %d, velocidad PWM %d, logicad del led PWM %d y logica del SWITCH %s",vel_envio,vel_fota,LED_logica,SWITCH_logica);
-
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
       {
