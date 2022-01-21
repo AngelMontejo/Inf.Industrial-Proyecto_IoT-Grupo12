@@ -46,7 +46,8 @@ int SENSOR = 5;       //Pin de datos del sensor
 
 //Variables de led:
 char ID_PLACA[16];        // Cadenas para ID de la placa
-int PWM_status;           // Variable que indica estado del LED1
+float PWM_status;           // Variable que indica estado del LED1
+float PWM_actual=0;            // Variable que indica estado del LED1 durante cambios de intensidad
 int PWM_anterior;         // Variable guarda valor PWM anterior
 int Switch_status;        // Variable que indica estado del LED2
 int Switch_anterior;      // Variable guarda valor SWITCH anterior
@@ -64,8 +65,8 @@ Button2 button;         // Objeto de la cabecera button2.h
 char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
-const char* ssid = "Redmi";                // Usuario del punto de acceso.
-const char* password = "movildejavi";          // Contraseña del punto de acceso.
+const char* ssid = "DIGIFIBRA-u94C";                // Usuario del punto de acceso.
+const char* password = "yNX4DQuk75";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
 const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
@@ -306,8 +307,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         LED_logica = root["LED"];           // Logica del LED1
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
         
-        Serial.printf("Mensaje OK, nueva configuración. Velocidad de publicación %d, velocidad de actualización %d, velocidad PWM %d, logicad del led PWM %d y logica del SWITCH %s",vel_envio,vel_fota,LED_logica,SWITCH_logica);
-
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
       {
@@ -320,7 +319,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<32> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<64> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -339,20 +338,39 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];            // Se guarda el contenido del campo "id"
-
-        // Se muestra info del mensaje
+        //LED_logica=root["polaridad"];
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
+        // Se muestra info del mensaje
+        Serial.print("POLARIDAD = ");
+        Serial.println(LED_logica);
         
         // Cambio de escala de [0,100] a [0,255]:
-        if(LED_logica==0){                     
-        PWM_status = 255 - PWM_led*(255/100);         // Logica inversa
+        if(LED_logica==0){    
+        Serial.println(PWM_led);                 
+        PWM_status = 255 - (PWM_led*255/100);         // Logica inversa
+        Serial.print("Inversa = ");
+        Serial.println(PWM_status);
         }                                      
         else{
-        PWM_status=PWM_led*(255/100);                // Logica directa
+        Serial.println(PWM_led); 
+        PWM_status = PWM_led*255/100;                // Logica directa
+        Serial.print("Directa = ");
+        Serial.println(PWM_status);
         }
-        analogWrite(LED1,PWM_status);    // Escribimos en el LED1 el valor de PWM.
-        
+
+        while (PWM_actual>PWM_status)
+        {
+          delay(vel_PWM);
+          PWM_actual=((PWM_actual*100/255)-1)*255/100;
+          analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de PWM.
+        }
+        while (PWM_actual<PWM_status)
+        {
+          delay(vel_PWM);
+          PWM_actual=((PWM_actual*100/255)+1)*255/100;
+          analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de PWM.
+        }
         // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
          if(PWM_anterior != PWM_status)
          {
@@ -386,7 +404,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic,topic_switch_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<32> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<64> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -405,11 +423,13 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         Switch_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];               // Se guarda el contenido del campo "id"
+        //LED_logica=root["polaridad"];
 
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, valor del switch = ");
         Serial.println(Switch_led);
-
+        Serial.print("POLARIDAD = ");
+        Serial.println(LED_logica);
         // Se configura la salida en función del tipo de logica que se aplique
         if(SWITCH_logica==0){       // Logica inversa
           if(Switch_led==1) {Switch_status=HIGH;}
