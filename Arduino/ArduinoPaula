@@ -339,7 +339,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];            // Se guarda el contenido del campo "id"
-        LED_logica=root["polaridad"];
+        //LED_logica=root["polaridad"];
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
         // Se muestra info del mensaje
@@ -349,9 +349,13 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         // Cambio de escala de [0,100] a [0,255]:
         if(LED_logica==0){                     
         PWM_status = 255 - PWM_led*(255/100);         // Logica inversa
+        Serial.print("Inversa = ");
+        Serial.println(PWM_status);
         }                                      
         else{
         PWM_status=PWM_led*(255/100);                // Logica directa
+        Serial.print("Directa = ");
+        Serial.println(PWM_status);
         }
         analogWrite(LED1,PWM_status);    // Escribimos en el LED1 el valor de PWM.
         
@@ -407,7 +411,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         Switch_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];               // Se guarda el contenido del campo "id"
-        LED_logica=root["polaridad"];
+        //LED_logica=root["polaridad"];
 
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, valor del switch = ");
