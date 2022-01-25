@@ -1,0 +1,429 @@
+[
+    {
+        "id": "7afec5f86da3e81c",
+        "type": "tab",
+        "label": "TELEGRAM",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "868a191a87ecd1ac",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje bienvenida y cambio intensidad",
+        "func": "var valor=parseInt(msg.payload.content)\nif(valor>=0 && valor<=100)\n{\n msg.payload.content=\"Se ha cambiado la intensidad del led a \"+valor;\n msg.payload.intensidad=valor\n msg.payload.origin=\"Telegram\"\n}\nelse if(valor<0 || valor>100)\n{\n msg.payload.content=\"Se necesita un valor entre 0 y 100 para cambiar la intensidad del led\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nelse if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \" +msg.originalMessage.from.first_name+  \", soy el bot del Grupo 12. Puedo responderte a estos comandos:\\n/start\\n/datos\\n/config\\n/led\\n/cambiarled\\n/switch\";\n msg.payload.intensidad=flow.get(\"ledlevel\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 140,
+        "wires": [
+            [
+                "38df64e240219023",
+                "be48f8bb3f7637e0",
+                "74081b71f4049265"
+            ]
+        ]
+    },
+    {
+        "id": "950fadf060e1548a",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje respuesta",
+        "func": "var envia=global.get(\"envia\").toString()\nvar actualiza=global.get(\"actualiza\").toString()\nvar velocidad=global.get(\"velocidad\").toString()\nvar led=global.get(\"led\").toString()\nvar switches=global.get(\"switches\").toString()\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n    msg.payload.content=\"Información: \\nenvia: \" +envia+\"\\nactualiza: \"+actualiza+\"\\nvelocidad: \"+velocidad+\"\\nled: \"+led+\"\\nswitch: \"+switches;\n//}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 280,
+        "wires": [
+            [
+                "38df64e240219023"
+            ]
+        ]
+    },
+    {
+        "id": "483a9a612b3c2498",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje respuesta",
+        "func": "var vcc=global.get(\"vcc\")\nvar temp=global.get(\"temp\")\nvar hum=global.get(\"hum\")\nvar uptime=global.get(\"uptime\")\nvar rssi=global.get(\"rssi\")\nvar ssid=global.get(\"ssid\")\nvar ip=global.get(\"ip\")\n//var enviado=flow.get(\"enviar\")\n//if (enviado==true){\n   msg.payload.content=\"Datos: \\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\n//}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 340,
+        "wires": [
+            [
+                "38df64e240219023"
+            ]
+        ]
+    },
+    {
+        "id": "94401e5e1f05c5f5",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje respuesta",
+        "func": "var ledlevel=global.get(\"ledlevel\")\n//if (enviado==true){\n    msg.payload.content=\"Nivel del led: \" +ledlevel;\n//}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 400,
+        "wires": [
+            [
+                "38df64e240219023"
+            ]
+        ]
+    },
+    {
+        "id": "07086abeca1abadd",
+        "type": "telegram receiver",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "bot": "b2cc055e98302147",
+        "saveDataDir": "",
+        "filterCommands": true,
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "868a191a87ecd1ac"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "79ad06ad54e3991f",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/config",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 370,
+        "y": 280,
+        "wires": [
+            [
+                "950fadf060e1548a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d69d3b781e2145fa",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/start",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 180,
+        "wires": [
+            [
+                "868a191a87ecd1ac"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "f024ca3a049cd1c9",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/datos",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 370,
+        "y": 340,
+        "wires": [
+            [
+                "483a9a612b3c2498"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "cd782e0d9db6e26d",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/led",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 370,
+        "y": 400,
+        "wires": [
+            [
+                "94401e5e1f05c5f5"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "38df64e240219023",
+        "type": "telegram sender",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "bot": "b2cc055e98302147",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 930,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9038d281d196e9f3",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/cambiarled",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 370,
+        "y": 460,
+        "wires": [
+            [
+                "dfba91663c1bc3a0"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "dfba91663c1bc3a0",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje respuesta",
+        "func": "msg.payload.content=\"Introduce intensidad del led entre 0 y 100 \" \nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 460,
+        "wires": [
+            [
+                "38df64e240219023"
+            ]
+        ]
+    },
+    {
+        "id": "be48f8bb3f7637e0",
+        "type": "change",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ledlevel",
+                "pt": "global",
+                "to": "payload.intensidad",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "origen",
+                "pt": "global",
+                "to": "payload.origin",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "chatID",
+                "pt": "global",
+                "to": "payload.chatId",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "74081b71f4049265",
+        "type": "debug",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "3067bdc33f8c3eaa",
+        "type": "telegram command",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "command": "/switch",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 370,
+        "y": 520,
+        "wires": [
+            [
+                "33932fa72ac5039b"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "33932fa72ac5039b",
+        "type": "function",
+        "z": "7afec5f86da3e81c",
+        "name": "mensaje respuesta",
+        "func": "if (global.get(\"switches\")===true)\n{\n    msg.payload.content=\"Switch apagado\"\n    msg.payload.sw=false;\n}\nelse if (flow.get(\"switches\")===false)\n{\n    msg.payload.content=\"Switch encendido\"\n    msg.payload.sw=true;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 520,
+        "wires": [
+            [
+                "38df64e240219023",
+                "7e022b7a7fe67b6e",
+                "23d80aa2197956e9"
+            ]
+        ]
+    },
+    {
+        "id": "7e022b7a7fe67b6e",
+        "type": "change",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "switches",
+                "pt": "flow",
+                "to": "payload.sw",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 890,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "23d80aa2197956e9",
+        "type": "debug",
+        "z": "7afec5f86da3e81c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "b2cc055e98302147",
+        "type": "telegram bot",
+        "botname": "ProyectoGrupo12_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    }
+]
