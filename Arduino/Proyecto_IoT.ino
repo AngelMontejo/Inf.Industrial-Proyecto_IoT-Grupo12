@@ -46,17 +46,22 @@ int SENSOR = 5;       //Pin de datos del sensor
 
 //Variables de led:
 char ID_PLACA[16];        // Cadenas para ID de la placa
-int PWM_status;           // Variable que indica estado del LED1
-int PWM_anterior;         // Variable guarda valor PWM anterior
+float PWM_status;           // Variable que indica estado del LED1
+float PWM_actual;           // Variable que indica estado del LED1 durante cambios de intensidad
+float PWM_boton;         // Variable guarda valor PWM anterior oara el boton
+float PWM_anterior;         // Variable guarda valor PWM anterior
+float PWM_pub;
 int Switch_status;        // Variable que indica estado del LED2
 int Switch_anterior;      // Variable guarda valor SWITCH anterior
 
 //Variables de configuración
 int vel_envio=30;
 int vel_fota=0;
-int vel_PWM;
+int vel_PWM=0;
 int LED_logica=0;
 int SWITCH_logica=0;
+float T_MAX=50;
+float HUM_MAX=50;
 
 //Variables botones
 #define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
@@ -64,8 +69,8 @@ Button2 button;         // Objeto de la cabecera button2.h
 char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
-const char* ssid = "infind";                // Usuario del punto de acceso.
-const char* password = "1518wifi";          // Contraseña del punto de acceso.
+const char* ssid = "MIWIFI_E32g";           // Usuario del punto de acceso.
+const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
 const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
@@ -169,8 +174,6 @@ void setup_wifi() {
     Serial.print(".");
   }
 
-  randomSeed(micros());
-
   Serial.println("");
   Serial.println("WiFi connected");   // Informa de que ya nos hemos podido conectar al wifi
   Serial.println("IP address: ");
@@ -190,8 +193,8 @@ void reconnect() {
     String clientId = String(ID_PLACA);
     
     // Definimos los mensajes de conexion y desconexion
-    snprintf(msg_on, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":true}",ID_PLACA);
-    snprintf(msg_off, MSG_BUFFER_SIZE, "{\"CHIPID\":%s,\"online\":false}",ID_PLACA);
+    snprintf(msg_on, MSG_BUFFER_SIZE, "{\"CHIPID\":\"%s\",\"online\":true}",ID_PLACA);
+    snprintf(msg_off, MSG_BUFFER_SIZE, "{\"CHIPID\":\"%s\",\"online\":false}",ID_PLACA);
 
 
     // Intento de conectarse
@@ -199,7 +202,7 @@ void reconnect() {
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(topic_conexion, "Conexion al topic exitosa");        // Publicamos el estado de conexion en "II12/ID_PLACA/conexion"
+      client.publish(topic_conexion, "Conexion al topic exitosa");        //Publicamos el estado de conexion en "II12/ID_PLACA/conexion"
       client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
       client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
       client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
@@ -235,15 +238,16 @@ void click(Button2& btn) {  //Simple click: Apaga LED PWM/ Enciende a último va
     sprintf(tipo_pulsacion, "simpleclick");
     //Apagamos/Encendemos el LED1:
     if (PWM_status<255){
-      PWM_anterior = PWM_status;
-      PWM_status=255;  // Se apaga el LED2 
+      PWM_boton = PWM_status;
+      PWM_status=255;  // Se apaga el LED1
       analogWrite(LED1,PWM_status); // Escribe el valor calculado
     }
     else{
-      PWM_status=PWM_anterior;
-      analogWrite(LED1,PWM_anterior); //Ponemos la intensidad del LED al ultimo valor registrado
+      PWM_status=PWM_boton;
+      analogWrite(LED1,PWM_boton); //Ponemos la intensidad del LED al ultimo valor registrado
     }
-    pub_msg_led(PWM_status); //Llamamos funcion manda mensaje de actualizacion del LED1   
+    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
+    PWM_anterior=PWM_status;   
 }
 void longClickDetected(Button2& btn) {
     Serial.println("long click detected\n");
@@ -259,24 +263,112 @@ void doubleClick(Button2& btn) {
     Serial.println("double click\n");
     sprintf(tipo_pulsacion, "doubleclick");
     //LED1 a nivel máximo:
-    PWM_anterior = PWM_status;
+    PWM_boton = PWM_status;
     PWM_status=0;
+    PWM_anterior=PWM_status;
     analogWrite(LED1,PWM_status); // Actualizamos su valor
-    pub_msg_led(PWM_status);          //Llamamos funcion manda mensaje de actualizacion del LED1 
+    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
 }
-void pub_msg_led(int PWM_status) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
+//--------------------MENSAJE PWM----------------------------
+void pub_msg_led(float PWM, char* origen, int id) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
     // Genera mensaje para publicar
     StaticJsonDocument<96> doc;
     doc["CHIPID"] = ID_PLACA;
     doc["Polaridad"]=LED_logica;
-    doc["LED"] = PWM_status;
-    doc["origen"] = "pulsador";
+    doc["LED"] = PWM;
+    doc["origen"] = origen;
+    if(origen=="mqtt")
+    {
+      doc["id"] = id;
+    }
     serializeJson(doc, msg_led);
     //Mostramos mensaje:
     Serial.print("Mensaje de confirmación de intensidad: ");
     Serial.println(msg_led);
     // Publicamos mensaje     
     client.publish(topic_led_status, msg_led);
+}
+//-------------------MENSAJE SWITCH----------------------
+void pub_msg_switch(int SWITCH, char* origen, int id)
+{
+  // Genera mensaje para publicar
+    StaticJsonDocument<128> doc;
+    doc["CHIPID"] = ID_PLACA;
+    doc["Polaridad"]=SWITCH_logica;
+    doc["SWITCH"] = SWITCH;
+    doc["origen"] = origen;
+    if(origen=="mqtt")
+    {
+       doc["id"] = id;
+    }
+    serializeJson(doc, msg_led);
+        
+    //Mostramos el mensaje
+    Serial.print("Mensaje de confirmación de intensidad: ");
+    Serial.println(msg_led);
+  
+    // Publicamos mensaje     
+    client.publish(topic_switch_status, msg_led);
+}
+
+//-------------------MENSAJE DATOS------------------------
+void pub_msg_datos(struct registro_datos misdatos)
+{    
+    // Generamos el mensaje JSON:
+    String msg_JSON;
+    StaticJsonDocument<256> jsonRoot;
+    
+    jsonRoot["CHIPID"]=misdatos.chipid;
+    jsonRoot["Uptime"]= misdatos.tiempo;
+    jsonRoot["Vcc"]=misdatos.bateria;
+    JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
+    DHT11["Temperatura"] = misdatos.temp;
+    DHT11["Humedad"] = misdatos.hum;
+    jsonRoot["LED"]=misdatos.valor_led;
+    jsonRoot["SWITCH"]=misdatos.valor_switch;
+    JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
+    Wifi["SSID"]=misdatos.SSId;
+    Wifi["IP"]=misdatos.ip;
+    Wifi["RSSI"]=misdatos.rssi;
+    serializeJson(jsonRoot,msg_JSON);
+    
+    strcpy(msg_datos,msg_JSON.c_str());
+    
+    Serial.print("Mensaje JSON de datos: ");
+    Serial.println(msg_datos); 
+    //Se publica el mensaje en el topic correspondiente
+    client.publish(topic_datos, msg_datos);  
+  
+}
+
+//-------------------ACCIÓN DE CONTROL------------------------
+void control_PWM(struct registro_datos misdatos)
+{
+  if(misdatos.temp>T_MAX & PWM_status!=255) //Si la temperatura supera el límite apagamos los focos
+  { 
+      PWM_status=255;
+      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualiz
+  }
+  else if(misdatos.temp<T_MAX)
+  {
+      if(PWM_status!=PWM_anterior){
+        pub_msg_led(PWM_anterior,"control",-1);
+      }
+      PWM_status=PWM_anterior;      
+  }
+}
+
+void control_SWITCH(struct registro_datos misdatos)
+{
+  if(misdatos.hum>HUM_MAX & Switch_status!=LOW)
+  {
+    Switch_status=LOW;
+    pub_msg_switch(Switch_status,"control",-1);
+  }
+  else
+  {
+    Switch_status=Switch_anterior;
+  }
 }
 //-------------------PROCESAR MENSAJES----------------------------
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
@@ -308,9 +400,9 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         vel_PWM = root["velocidad"];        // Velocidad de incremento PWM
         LED_logica = root["LED"];           // Logica del LED1
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
+        T_MAX = root["T_MAX"];               // Temperatura maxima
+        HUM_MAX = root["HUM_MAX"];           // Humedad máxima
         
-        Serial.printf("Mensaje OK, nueva configuración. Velocidad de publicación %d, velocidad de actualización %d, velocidad PWM %d, logicad del led PWM %d y logica del SWITCH %s",vel_envio,vel_fota,LED_logica,SWITCH_logica);
-
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
       {
@@ -323,12 +415,12 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<32> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<64> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
     //Variables para operar:
-    int PWM_led;  // Guarda contenido del campo "level" del mensaje 
+    float PWM_led;  // Guarda contenido del campo "level" del mensaje 
     int id;     // Guarda el identificador del mensaje
     
     // Compruebo si no hubo error
@@ -342,40 +434,49 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];            // Se guarda el contenido del campo "id"
-
-        // Se muestra info del mensaje
+        
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
+        // Se muestra info del mensaje
+        Serial.print("POLARIDAD = ");
+        Serial.println(LED_logica);
         
         // Cambio de escala de [0,100] a [0,255]:
-        if(LED_logica==0){                     
-        PWM_status = 255 - PWM_led*(255/100);         // Logica inversa
+        if(LED_logica==0){    
+        Serial.println(PWM_led);                 
+        PWM_status = 255 - (PWM_led*255/100);         // Logica inversa
+        Serial.print("Inversa = ");
+        Serial.println(PWM_status);
         }                                      
         else{
-        PWM_status=PWM_led*(255/100);                // Logica directa
+        Serial.println(PWM_led); 
+        PWM_status = PWM_led*255/100;                // Logica directa
+        Serial.print("Directa = ");
+        Serial.println(PWM_status);
         }
-        analogWrite(LED1,PWM_status);    // Escribimos en el LED1 el valor de PWM.
-        
+
         // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
          if(PWM_anterior != PWM_status)
          {
-          // Genera mensaje para publicar
-          StaticJsonDocument<128> doc;
-
-          doc["CHIPID"] = ID_PLACA;
-          doc["Polaridad"]=LED_logica;
-          doc["LED"] = PWM_status;
-          doc["origen"] = "mqtt";
-          doc["id"] = id;
-          serializeJson(doc, msg_led);
-       
-          Serial.print("Mensaje de confirmación de intensidad: ");
-          Serial.println(msg_led);
-      
-          // Publicamos mensaje     
-          client.publish(topic_led_status, msg_led);
+          pub_msg_led(PWM_status,"mqtt",id);
+//          // Genera mensaje para publicar
+//          StaticJsonDocument<128> doc;
+//
+//          doc["CHIPID"] = ID_PLACA;
+//          doc["Polaridad"]=LED_logica;
+//          doc["LED"] = PWM_status;
+//          doc["origen"] = "mqtt";
+//          doc["id"] = id;
+//
+//          serializeJson(doc, msg_led);
+//          
+//          Serial.print("Mensaje de confirmación de intensidad: ");
+//          Serial.println(msg_led);
+//      
+//          // Publicamos mensaje     
+//          client.publish(topic_led_status, msg_led);
     
-          PWM_anterior = PWM_status; // Guarda nuevo valor en la variable global
+          PWM_anterior = PWM_status; // Guarda nuevo valor en la variable para hacer control
          }        
       }
       else  // En el mensaje no existe el campo "level"
@@ -389,7 +490,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic,topic_switch_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<32> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<64> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -412,7 +513,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, valor del switch = ");
         Serial.println(Switch_led);
-
+        Serial.print("POLARIDAD = ");
+        Serial.println(LED_logica);
         // Se configura la salida en función del tipo de logica que se aplique
         if(SWITCH_logica==0){       // Logica inversa
           if(Switch_led==1) {Switch_status=HIGH;}
@@ -422,24 +524,24 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           if(Switch_led==1){Switch_status=LOW;}
           else{Switch_status=HIGH;} 
         }
-        
-        digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de SWITCH                                        
+                                              
         if(Switch_anterior!=Switch_status){
-          // Genera mensaje para publicar
-          StaticJsonDocument<128> doc;
-          doc["CHIPID"] = ID_PLACA;
-          doc["Polaridad"]=SWITCH_logica;
-          doc["SWITCH"] = Switch_status;
-          doc["origen"] = "mqtt";
-          doc["id"] = id;
-          serializeJson(doc, msg_led);
-          
-          //Mostramos el mensaje
-          Serial.print("Mensaje de confirmación de intensidad: ");
-          Serial.println(msg_led);
-  
-          // Publicamos mensaje     
-          client.publish(topic_switch_status, msg_led);
+          pub_msg_switch(Switch_status,"mqtt",id);
+//          // Genera mensaje para publicar
+//          StaticJsonDocument<128> doc;
+//          doc["CHIPID"] = ID_PLACA;
+//          doc["Polaridad"]=SWITCH_logica;
+//          doc["SWITCH"] = Switch_status;
+//          doc["origen"] = "mqtt";
+//          doc["id"] = id;
+//          serializeJson(doc, msg_led);
+//          
+//          //Mostramos el mensaje
+//          Serial.print("Mensaje de confirmación de intensidad: ");
+//          Serial.println(msg_led);
+//  
+//          // Publicamos mensaje     
+//          client.publish(topic_switch_status, msg_led);
 
           Switch_anterior = Switch_status;   // Guarda nuevo valor en la variable global
         }
@@ -464,16 +566,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       Serial.println(error.c_str());
     }
     else
-      if(root.containsKey("actualiza"))    // Se comprueba si existe el campo "actualiza"
-      { 
         lastAct=millis();
         intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
-      }
-      else  // En el mensaje no existe el campo "actualiza"
-      {
-        Serial.print("Error : ");
-        Serial.println("\"actualiza\" key not found in JSON");
-      }
   }
   else   // Si no se reconoce el topic
   {
@@ -495,6 +589,7 @@ void setup() {
   // Inicializa variables controlan LEDs
   PWM_status=HIGH;
   PWM_anterior=HIGH;
+  PWM_boton=HIGH;
   Switch_status=HIGH;
   
   Serial.begin(115200);       // Establecemos la velocidad del puerto serie
@@ -567,15 +662,23 @@ void loop() {
 
   // Loop del boton:
     button.loop();             // Llamamos a la funcion del boton
+
     
+//CONTROL PARAMETROS--------------
+  //Control led PWM en funcion de la temperatura:
+  misdatos.temp = dht.getTemperature();    // Datos de temperatura.
+  control_PWM(misdatos);
+  //Control SITCH en funcion de la humedad:
+  misdatos.hum = dht.getHumidity();        // Datos de humedad.
+  control_SWITCH(misdatos);
+
+//MENSAJE DE DATOS----------------
   // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
     lastMsg = misdatos.tiempo;  // Actualizamos cuando se recibió el último mensaje.
 
     // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
     sprintf(misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
-    misdatos.hum = dht.getHumidity();        // Datos de humedad.
-    misdatos.temp = dht.getTemperature();    // Datos de temperatura.
     misdatos.bateria = ESP.getVcc();         // Medimos la alimentación de la placa.
    
     // Actualizamos datos de conexión.
@@ -586,30 +689,23 @@ void loop() {
     // Actualizamos valores de los leds 
     misdatos.valor_led = PWM_status;
     misdatos.valor_switch = Switch_status;
-    
-    // Generamos el mensaje JSON:
-    String msg_JSON;
-    StaticJsonDocument<256> jsonRoot;
-    
-    jsonRoot["CHIPID"]=misdatos.chipid;
-    jsonRoot["Uptime"]= misdatos.tiempo;
-    jsonRoot["Vcc"]=misdatos.bateria;
-    JsonObject DHT11=jsonRoot.createNestedObject("DHT11");
-    DHT11["Temperatura"] = misdatos.temp;
-    DHT11["Humedad"] = misdatos.hum;
-    jsonRoot["LED"]=misdatos.valor_led;
-    jsonRoot["SWITCH"]=misdatos.valor_switch;
-    JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
-    Wifi["SSID"]=misdatos.SSId;
-    Wifi["IP"]=misdatos.ip;
-    Wifi["RSSI"]=misdatos.rssi;
-    serializeJson(jsonRoot,msg_JSON);
-    
-    strcpy(msg_datos,msg_JSON.c_str());
-    
-    Serial.print("Mensaje JSON de datos: ");
-    Serial.println(msg_datos); 
-    //Se publica el mensaje en el topic correspondiente
-    client.publish(topic_datos, msg_datos);  
-  }    
+
+    //Publicamos el mensaje:
+    pub_msg_datos(misdatos);
+  }
+
+//ACTUADORES---------------------------
+  if(PWM_actual!=PWM_status)
+  {
+      delay(vel_PWM);
+      if(PWM_actual>PWM_status){
+         PWM_actual=((PWM_actual*100/255)-1)*255/100;
+      }
+      else{
+         PWM_actual=((PWM_actual*100/255)+1)*255/100;
+      }
+      analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de PWM.
+  }
+
+  digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de SWITCH  
 }
