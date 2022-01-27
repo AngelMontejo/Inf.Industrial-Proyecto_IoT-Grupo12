@@ -7,9 +7,10 @@
 
 //--------------DEFINICION VARIABLES--------------------------
 //Datos para actualización OTA:
-#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
-#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
-#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
+#define OTA_URL "https://iot.ac.uma.es:1880/esp8266-ota/update"// Address of OTA update server
+//#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
+//#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
+//#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
 #define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
 
 //Funciones para progreso de OTA
@@ -48,7 +49,8 @@ int SENSOR = 5;       //Pin de datos del sensor
 char ID_PLACA[16];        // Cadenas para ID de la placa
 float PWM_status;           // Variable que indica estado del LED1
 float PWM_actual=0;            // Variable que indica estado del LED1 durante cambios de intensidad
-int PWM_anterior;         // Variable guarda valor PWM anterior
+float PWM_boton;         // Variable guarda valor PWM anterior para el boton
+float PWM_anterior;         // Variable guarda valor PWM anterior
 int Switch_status;        // Variable que indica estado del LED2
 int Switch_anterior;      // Variable guarda valor SWITCH anterior
 
@@ -58,6 +60,8 @@ int vel_fota=0;
 int vel_PWM;
 int LED_logica=0;
 int SWITCH_logica=0;
+float T_MAX=40;
+float HUM_MAX=70;
 
 //Variables botones
 #define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
@@ -100,15 +104,18 @@ void intenta_OTA()
 { 
   Serial.println( "--------------------------" );  
   Serial.println( "Comprobando actualización:" );
-  Serial.print(HTTP_OTA_ADDRESS);Serial.print(":");Serial.print(HTTP_OTA_PORT);Serial.println(HTTP_OTA_PATH);
+  Serial.println(OTA_URL);
   Serial.println( "--------------------------" );  
   ESPhttpUpdate.setLedPin(LED_OTA, LOW);
   ESPhttpUpdate.onStart(inicio_OTA);
   ESPhttpUpdate.onError(error_OTA);
   ESPhttpUpdate.onProgress(progreso_OTA);
   ESPhttpUpdate.onEnd(final_OTA);
-  WiFiClient wClient;
-  switch(ESPhttpUpdate.update(wClient, HTTP_OTA_ADDRESS, HTTP_OTA_PORT, HTTP_OTA_PATH, HTTP_OTA_VERSION)) {
+  WiFiClientSecure wClient;
+  // Reading data over SSL may be slow, use an adequate timeout
+  wClient.setTimeout(12); // timeout argument is defined in seconds for setTimeout
+  wClient.setInsecure();
+  switch(ESPhttpUpdate.update(wClient, OTA_URL, HTTP_OTA_VERSION)) {
     case HTTP_UPDATE_FAILED:
       Serial.printf(" HTTP update failed: Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
       break;
@@ -198,10 +205,10 @@ void reconnect() {
     {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish(topic_conexion, "Conexion al topic exitosa");        // Publicamos el estado de conexion en "II12/ID_PLACA/conexion"
-      client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
-      client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
-      client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
+      //client.publish(topic_conexion, "Conexion al topic exitosa");        // Publicamos el estado de conexion en "II12/ID_PLACA/conexion"
+      //client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
+      //client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
+      //client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
        
       // ... and resubscribe
       client.subscribe(topic_config);       // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
@@ -242,7 +249,8 @@ void click(Button2& btn) {  //Simple click: Apaga LED PWM/ Enciende a último va
       PWM_status=PWM_anterior;
       analogWrite(LED1,PWM_anterior); //Ponemos la intensidad del LED al ultimo valor registrado
     }
-    pub_msg_led(PWM_status); //Llamamos funcion manda mensaje de actualizacion del LED1   
+    pub_msg_led(PWM_status, "control", -1); //Llamamos funcion manda mensaje de actualizacion del LED1   
+    PWM_anterior=PWM_status;
 }
 void longClickDetected(Button2& btn) {
     Serial.println("long click detected\n");
@@ -260,15 +268,22 @@ void doubleClick(Button2& btn) {
     //LED1 a nivel máximo:
     PWM_anterior = PWM_status;
     PWM_status=0;
+    PWM_anterior=PWM_status;
     analogWrite(LED1,PWM_status); // Actualizamos su valor
-    pub_msg_led(PWM_status);          //Llamamos funcion manda mensaje de actualizacion del LED1 
+    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
 }
-void pub_msg_led(int PWM_status) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
+//--------------------MENSAJE PWM----------------------------
+void pub_msg_led(float PWM_status, char* origen, int id) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
     // Genera mensaje para publicar
-    StaticJsonDocument<96> doc;
+    StaticJsonDocument<128> doc;
     doc["CHIPID"] = ID_PLACA;
+    doc["Polaridad"]=LED_logica;
     doc["LED"] = PWM_status;
-    doc["origen"] = "pulsador";
+    doc["origen"] = origen;
+    if(origen=="mqtt")
+    {
+      doc["id"] = id;
+    }
     serializeJson(doc, msg_led);
     //Mostramos mensaje:
     Serial.print("Mensaje de confirmación de intensidad: ");
@@ -289,7 +304,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   // MENSAJE: Configuración  
   if(strcmp(topic,topic_config)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
-      StaticJsonDocument<96> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
+      StaticJsonDocument<128> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
       // Deserialize the JSON document
       DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -306,6 +321,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         vel_PWM = root["velocidad"];        // Velocidad de incremento PWM
         LED_logica = root["LED"];           // Logica del LED1
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
+        T_MAX = root["T_MAX"];               // Temperatura maxima
+        HUM_MAX = root["HUM_MAX"];           // Humedad máxima
         
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
@@ -319,7 +336,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   else if(strcmp(topic, topic_led_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
     // Variable Json para desearializar el mensaje
-    StaticJsonDocument<64> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    StaticJsonDocument<128> root;       // Indicamos el tamaño requerido para deserializar mensaje de comando del led
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -338,7 +355,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         PWM_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];            // Se guarda el contenido del campo "id"
-        //LED_logica=root["polaridad"];
+        
         Serial.print("Mensaje OK, nivel de intensidad = ");
         Serial.println(PWM_led);
         // Se muestra info del mensaje
@@ -378,6 +395,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
           StaticJsonDocument<128> doc;
 
           doc["CHIPID"] = ID_PLACA;
+          doc["Polaridad"]=LED_logica;
           doc["LED"] = PWM_status;
           doc["origen"] = "mqtt";
           doc["id"] = id;
@@ -423,7 +441,6 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       { 
         Switch_led = root["level"];    // Se guarda el contenido del campo "level" 
         id = root["id"];               // Se guarda el contenido del campo "id"
-        //LED_logica=root["polaridad"];
 
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, valor del switch = ");
@@ -511,6 +528,7 @@ void setup() {
   // Inicializa variables controlan LEDs
   PWM_status=HIGH;
   PWM_anterior=HIGH;
+  PWM_boton=HIGH;
   Switch_status=HIGH;
   
   Serial.begin(115200);       // Establecemos la velocidad del puerto serie
