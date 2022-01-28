@@ -1,0 +1,1221 @@
+[
+    {
+        "id": "f5791cc1f91c03bd",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "3827dcc1f25604e4",
+        "type": "mqtt in",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "topic": "II12/+/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "3a639d805437dfa5"
+            ]
+        ]
+    },
+    {
+        "id": "6c6b44a93b29588a",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "payload + fecha",
+        "func": "// Vamos a añadir a cada dato la fecha a la que ha sido recibido.\nmsg.payload.date = new Date();\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 220,
+        "wires": [
+            [
+                "aee3768f18ae1e6d"
+            ]
+        ]
+    },
+    {
+        "id": "aee3768f18ae1e6d",
+        "type": "mongodb out",
+        "z": "f5791cc1f91c03bd",
+        "mongodb": "c4d4bcf45ac11236",
+        "name": "",
+        "collection": "II12",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 990,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "6805d231b63c1d1c",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Almacenamos en la colección datos de los sensores, actuadores y conexión",
+        "info": "",
+        "x": 530,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "bdbb8aafb0568312",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Añadimos el campo fecha",
+        "info": "",
+        "x": 730,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "3a639d805437dfa5",
+        "type": "json",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 510,
+        "y": 220,
+        "wires": [
+            [
+                "6c6b44a93b29588a",
+                "c7d2dfd19bda3ae3"
+            ]
+        ]
+    },
+    {
+        "id": "9d360a45f940040e",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "consulta rapida",
+        "func": "// Guardamos la consulta en una variable.\nvar consulta = flow.get(\"consulta\");\nmsg.payload ={};\n\n// Variables de tiempo auxiliares.\nvar ms_minuto = 60000;\nvar ms_hora = 60 * ms_minuto;\nvar ms_dia = 24 * ms_hora;\nvar ms_semana = 7 * ms_dia;\nvar ms_mes = 30 * ms_dia;\n\n// Variable con el timestamp actual (en ms)\nvar now_ms = new Date().getTime();\n\n// Creamos objetos fecha con el timestamp deseado.\nvar hour_ago = new Date(now_ms - ms_hora);\nvar day_ago = new Date(now_ms - ms_dia);\nvar week_ago = new Date(now_ms - ms_semana);\nvar month_ago = new Date(now_ms - ms_mes);\n\n// Dependiendo del botón pulsado, tenemos una fecha u otra.\n\nif(consulta === \"hora\")\n{\n    msg.payload = [\n    { \"$match\": {\"date\": {\"$gte\": hour_ago}}},\n    { \"$project\": {\n      \"_id\": 0,    \n      \"date\": 1,\n      \"Uptime\": 1,\n      \"Vcc\": 1,\n      \"LED\": 1,\n      \"SWITCH\": 1,\n      \"temperatura\": \"$DHT11.Temperatura\",\n      \"humedad\": \"$DHT11.Humedad\",\n      \"ssid\": \"$Wifi.SSID\",\n      \"ip\": \"$Wifi.IP\",\n      \"rssi\": \"$Wifi.RSSI\"\n      }\n    },\n    { \"$sort\": {\"date\": 1} }\n    ];\n} \n\nelse if(consulta === \"dia\")\n{\n    msg.payload= [\n    { \"$match\": {\"date\": {\"$gte\": day_ago}}},\n    { \"$project\": {\n      \"_id\": 0,    \n      \"date\": 1,\n      \"Uptime\": 1,\n      \"Vcc\": 1,\n      \"LED\": 1,\n      \"SWITCH\": 1, \n      \"temperatura\": \"$DHT11.Temperatura\",\n      \"humedad\": \"$DHT11.Humedad\",\n      \"ssid\": \"$Wifi.SSID\",\n      \"ip\": \"$Wifi.IP\",\n      \"rssi\": \"$Wifi.RSSI\"\n      }\n    },\n    { \"$sort\": {\"date\": 1} }\n    ];\n}\n\nelse if(consulta === \"semana\")\n{\n    msg.payload = [\n    { \"$match\": {\"date\": {\"$gte\": week_ago}}},\n    { \"$project\": {\n      \"_id\": 0,    \n      \"date\": 1,\n      \"Uptime\": 1,\n      \"Vcc\": 1,\n      \"LED\": 1,\n      \"SWITCH\": 1,\n      \"temperatura\": \"$DHT11.Temperatura\",\n      \"humedad\": \"$DHT11.Humedad\",\n      \"ssid\": \"$Wifi.SSID\",\n      \"ip\": \"$Wifi.IP\",\n      \"rssi\": \"$Wifi.RSSI\"\n      }\n    },\n    { \"$sort\": {\"date\": 1} }\n    ];\n}\n\nelse if (consulta === \"mes\")\n{\n    msg.payload = [\n    { \"$match\": {\"date\": {\"$gte\": month_ago}}},\n    { \"$project\": {\n      \"_id\": 0,    \n      \"date\": 1,\n      \"Uptime\": 1,\n      \"Vcc\": 1,\n      \"LED\": 1,\n      \"SWITCH\": 1,\n      \"temperatura\": \"$DHT11.Temperatura\",\n      \"humedad\": \"$DHT11.Humedad\",\n      \"ssid\": \"$Wifi.SSID\",\n      \"ip\": \"$Wifi.IP\",\n      \"rssi\": \"$Wifi.RSSI\"\n      }\n    },\n    { \"$sort\": {\"date\": 1} }\n    ];\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 520,
+        "wires": [
+            [
+                "356126af9f0ebab4",
+                "14add0c7859fc02a"
+            ]
+        ]
+    },
+    {
+        "id": "b82f8dc461c98ca2",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Guardamos en un fichero los documentos consultados",
+        "info": "",
+        "x": 1680,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "70b11e0db169d936",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "consulta intervalo",
+        "func": "// Fecha por defecto actual\nvar ahora = new Date();\n\n// Si en el dashboard se han seleccionado fechas de inicio y fin toma\n// sus variables globales, sino toma la fecha actual por defecto.\nvar desde = new Date(global.get(\"inicio\") || ahora);\nvar hasta = new Date(global.get(\"fin\") || ahora); \n\n// El día de inicio comienza a las 00:00\nvar inicio = new Date(desde.getFullYear(),desde.getMonth(),desde.getDate(),0,0,0,0);\n// el día final es hasta final del día\nvar final = new Date(hasta.getFullYear(),hasta.getMonth(),hasta.getDate(),23,59,59,999);\n\n// Sacamos los documentos de la colección que hay entre el día de inicio y el día final,\n// ordenándolos de más antiguos a menos.\nmsg.payload = [\n    { \"$match\": {\"date\": {\"$gte\": inicio, \"$lte\": final}}},\n    { \"$project\": {\n      \"date\": 1,\n      \"temperatura\": \"$DHT11.Temperatura\",\n      \"humedad\": \"$DHT11.Humedad\",\n    }},\n     { \"$group\": {\n      \"_id\": 0,\n      \"Tmedia\": {\"$avg\": \"$temperatura\"},\n      \"Tmax\": {\"$max\": \"$temperatura\"},\n      \"Tmin\": {\"$min\": \"$temperatura\"},\n      \"Tdev\": {\"$stdDevPop\": \"$humedad\"},\n      \"Hmedia\": {\"$avg\": \"$humedad\"},\n      \"Hmax\": {\"$max\": \"$humedad\"},\n      \"Hmin\": {\"$min\": \"$humedad\"},\n      \"Hdev\": {\"$stdDevPop\": \"$humedad\"}\n    }},\n    { \"$sort\": {\"date\": 1} }\n    ];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 980,
+        "wires": [
+            [
+                "2244c599f2eb6af0"
+            ]
+        ]
+    },
+    {
+        "id": "f226c1a49a80eb15",
+        "type": "http in",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "url": "/RegistrosConsultaRapida",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "9d360a45f940040e"
+            ]
+        ]
+    },
+    {
+        "id": "3c33ab58f07895fa",
+        "type": "ui_template",
+        "z": "f5791cc1f91c03bd",
+        "group": "e8ac12aa380cb87f",
+        "name": "Estadisticas",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #439ebf;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #317a94;\n  }\n\n</style>\n<a href=\"/RegistrosIntervalo\" class=\"button\">Descarga estadisticas en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 990,
+        "y": 1400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b6b7308d1b986a7e",
+        "type": "ui_date_picker",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "label": "Fecha inicio",
+        "group": "e8ac12aa380cb87f",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "topicType": "str",
+        "className": "",
+        "x": 350,
+        "y": 1160,
+        "wires": [
+            [
+                "417f3e8819d76805"
+            ]
+        ]
+    },
+    {
+        "id": "a68f5bc03438e4a7",
+        "type": "ui_date_picker",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "label": "Fecha final",
+        "group": "e8ac12aa380cb87f",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "topicType": "str",
+        "className": "",
+        "x": 350,
+        "y": 1220,
+        "wires": [
+            [
+                "fd5a52f792f8c4f7"
+            ]
+        ]
+    },
+    {
+        "id": "417f3e8819d76805",
+        "type": "change",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inicio",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 1160,
+        "wires": [
+            [
+                "8a294555439f65a7"
+            ]
+        ]
+    },
+    {
+        "id": "fd5a52f792f8c4f7",
+        "type": "change",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "fin",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 1220,
+        "wires": [
+            [
+                "0c773aec409bb984"
+            ]
+        ]
+    },
+    {
+        "id": "aad6d2c22072ae39",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Controles para seleccionar fechas del intervalo",
+        "info": "",
+        "x": 460,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "8b8b585309afe370",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Botones en HTML para lanzar descarga de fichero",
+        "info": "",
+        "x": 1090,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "682dd1d54918ad65",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "Consulta Rapida",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "ccdab35c517c9506",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Maximo Humedad",
+        "format": "{{msg.payload[0].Hmax | number:2}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1310,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "845513c5730032db",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Minimo Humedad",
+        "format": "{{msg.payload[0].Hmin | number:2}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1270,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "0e10ebc67d4a9785",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media Humedad",
+        "format": "{{msg.payload[0].Hmedia | number:2}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1240,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "bee7908753112cfd",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Desviacion Humedad",
+        "format": "{{msg.payload[0].Hdev | number:2 }}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1200,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "8f52c1be421e0493",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Maximo Temperatura",
+        "format": "{{msg.payload[0].Tmax | number:2}} ºC",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1180,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "d6f1c0fdb262c9b2",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Minimo Temperatura",
+        "format": "{{msg.payload[0].Tmin | number:2}} ºC",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1240,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "9888f5d44c6ad48d",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Media Temperatura",
+        "format": "{{msg.payload[0].Tmedia | number:2}} ºC",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1270,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "1191db5122b8f2bd",
+        "type": "ui_text",
+        "z": "f5791cc1f91c03bd",
+        "group": "f437324503dfedde",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Desviacion Temperatura",
+        "format": "{{msg.payload[0].Tdev | number:2}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1330,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "356126af9f0ebab4",
+        "type": "mongodb in",
+        "z": "f5791cc1f91c03bd",
+        "mongodb": "c4d4bcf45ac11236",
+        "name": "",
+        "collection": "II12",
+        "operation": "aggregate",
+        "x": 1030,
+        "y": 520,
+        "wires": [
+            [
+                "980a0370e2c1d8f6",
+                "682dd1d54918ad65",
+                "18b4c1c1f766cdd1"
+            ]
+        ]
+    },
+    {
+        "id": "980a0370e2c1d8f6",
+        "type": "csv",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "sep": ";",
+        "hdrin": false,
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "date, Uptime, ssid, ip, rssi, Vcc, LED, SWITCH, temperatura, humedad",
+        "skip": 0,
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 1370,
+        "y": 520,
+        "wires": [
+            [
+                "76f667a66736eeea",
+                "b5ea6226f4028ad7"
+            ]
+        ]
+    },
+    {
+        "id": "06050a1eef98f8f1",
+        "type": "http response",
+        "z": "f5791cc1f91c03bd",
+        "name": "Descarga csv",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=RegistrosConsultaRapida.csv"
+        },
+        "x": 1800,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "b5ea6226f4028ad7",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1580,
+        "y": 520,
+        "wires": [
+            [
+                "06050a1eef98f8f1",
+                "64d7749812109f89"
+            ]
+        ]
+    },
+    {
+        "id": "2244c599f2eb6af0",
+        "type": "mongodb in",
+        "z": "f5791cc1f91c03bd",
+        "mongodb": "c4d4bcf45ac11236",
+        "name": "",
+        "collection": "II12",
+        "operation": "aggregate",
+        "x": 850,
+        "y": 980,
+        "wires": [
+            [
+                "654d9ed6fb3289d5",
+                "8f52c1be421e0493",
+                "d6f1c0fdb262c9b2",
+                "1191db5122b8f2bd",
+                "9888f5d44c6ad48d",
+                "ccdab35c517c9506",
+                "845513c5730032db",
+                "0e10ebc67d4a9785",
+                "bee7908753112cfd",
+                "dab5a9860b1b2bd5"
+            ]
+        ]
+    },
+    {
+        "id": "654d9ed6fb3289d5",
+        "type": "csv",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "sep": ";",
+        "hdrin": true,
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "Tmedia, Tmax, Tmin, Tdev, Hmedia, Hmax, Hmin, Hdev",
+        "skip": 0,
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 1250,
+        "y": 980,
+        "wires": [
+            [
+                "f4ef1336d4828b16"
+            ]
+        ]
+    },
+    {
+        "id": "5b02428e7c39522e",
+        "type": "http response",
+        "z": "f5791cc1f91c03bd",
+        "name": "Descarga csv",
+        "statusCode": "",
+        "headers": {
+            "Content-Disposition": "attachment; filename=RegistrosIntervalo.csv"
+        },
+        "x": 1680,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "f4ef1336d4828b16",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "Unicode y separador",
+        "func": "//add Unicode BOM character (byte order mark) to make EXCEL knows this is UTF-8\nif(global.get(\"separador_decimal\")==\"punto\")\n{\n    msg.payload='\\ufeff'+msg.payload;\n\n}\nelse\n{\n    msg.payload='\\ufeff'+(msg.payload).replace(/\\./g,\",\");\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1460,
+        "y": 980,
+        "wires": [
+            [
+                "5b02428e7c39522e",
+                "7891cdb8b183cd78"
+            ]
+        ]
+    },
+    {
+        "id": "2ca9701bb4cca4ba",
+        "type": "ui_chart",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "group": "7f7053c6d90715af",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Evolución Histórica",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1570,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2bb4af89b194a6e5",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Consultas de intervalo: para obtener estadísticas",
+        "info": "",
+        "x": 440,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "6a61885f8e9be7e1",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Consultas rápidas: evolución de sensores",
+        "info": "",
+        "x": 360,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "18b4c1c1f766cdd1",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "genera datos gráfica",
+        "func": "var arraytemp=[];\nvar arrayhum=[];\n\n// los arrays usados en la represenstación gráfica deben contener objetos JSON con dos campos: {x , y}\n// en x debemos poner la hora en formato \"timestamp\". Si tenemos un objeto fecha se puede convertir usando el método getTime()\n// en y debemos poner el valor de la variable\n// mas info en: https://github.com/node-red/node-red-dashboard/blob/master/Charts.md\n\nif(Array.isArray(msg.payload) && msg.payload.length>0)\n{\n    for (var i = 0; i < msg.payload.length; i++) { // añade datos a los array\n        arraytemp.push({x : msg.payload[i].date.getTime() , y : msg.payload[i].temperatura});\n        arrayhum.push({x : msg.payload[i].date.getTime() , y : msg.payload[i].humedad});\n    }\n}\n    \nmsg.payload = [{\n        \"series\":[\"temperatura\",\"humedad\"],\n        \"data\":[arraytemp, arrayhum],\n        \"labels\":[\"\"]\n        }];\n\nreturn msg;  ",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1340,
+        "y": 620,
+        "wires": [
+            [
+                "2ca9701bb4cca4ba",
+                "307fd17c0c57c204"
+            ]
+        ]
+    },
+    {
+        "id": "76f667a66736eeea",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1470,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "996aa6aebc48872b",
+        "type": "link in",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "links": [
+            "0c773aec409bb984",
+            "8a294555439f65a7"
+        ],
+        "x": 475,
+        "y": 940,
+        "wires": [
+            [
+                "70b11e0db169d936"
+            ]
+        ]
+    },
+    {
+        "id": "0c773aec409bb984",
+        "type": "link out",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "links": [
+            "996aa6aebc48872b"
+        ],
+        "x": 675,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "8a294555439f65a7",
+        "type": "link out",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "links": [
+            "996aa6aebc48872b"
+        ],
+        "x": 675,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "4b1c20d8b4f2f2bc",
+        "type": "http in",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "url": "/RegistrosIntervalo",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 360,
+        "y": 980,
+        "wires": [
+            [
+                "70b11e0db169d936"
+            ]
+        ]
+    },
+    {
+        "id": "3325f9a1e4e8606b",
+        "type": "ui_template",
+        "z": "f5791cc1f91c03bd",
+        "group": "e8ac12aa380cb87f",
+        "name": "ConsultaRapida",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n.button {\n    text-align: center;\n    font: bold 17px Arial;\n    text-decoration: none;\n    background-color: #439ebf;\n    color: white;\n    padding: 8px 10px;\n    border: 2px solid #CCCCCC;\n  }\n  \n  .button:hover\n  {\n   background-color: #317a94;\n  }\n\n</style>\n<a href=\"/RegistrosConsultaRapida\" class=\"button\">Descarga registros en CSV (EXCEL)</a>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 1180,
+        "y": 1400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1104a843f668083e",
+        "type": "ui_switch",
+        "z": "f5791cc1f91c03bd",
+        "name": "Separador Decimal",
+        "label": "{{msg.topic}}",
+        "tooltip": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 450,
+        "y": 1480,
+        "wires": [
+            [
+                "c6782db6199d5ae1"
+            ]
+        ]
+    },
+    {
+        "id": "9b91315ebe2d3924",
+        "type": "inject",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 330.99706649780273,
+        "y": 1402.9118814468384,
+        "wires": [
+            [
+                "c6782db6199d5ae1"
+            ]
+        ]
+    },
+    {
+        "id": "c6782db6199d5ae1",
+        "type": "function",
+        "z": "f5791cc1f91c03bd",
+        "name": "set global separador_decimal",
+        "func": "if(msg.payload===true)\n{\n    global.set(\"separador_decimal\",\"coma\");\n    msg.topic=\"separador decimal = coma\";\n}\nelse\n{\n    global.set(\"separador_decimal\",\"punto\");\n    msg.topic=\"separador decimal = punto\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 659.0084533691406,
+        "y": 1403.6192541122437,
+        "wires": [
+            [
+                "1104a843f668083e"
+            ]
+        ]
+    },
+    {
+        "id": "509304a66de1dbe2",
+        "type": "comment",
+        "z": "f5791cc1f91c03bd",
+        "name": "Selector de separador decimal (Coma o punto)",
+        "info": "",
+        "x": 440,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "64d7749812109f89",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "CSV1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1790,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "7891cdb8b183cd78",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "CSV2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "c7d2dfd19bda3ae3",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "Datos",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "dab5a9860b1b2bd5",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "Consulta2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "14add0c7859fc02a",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "P1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "05ec498e3d8a6e1a",
+        "type": "change",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "consulta",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 660,
+        "wires": [
+            [
+                "9d360a45f940040e",
+                "fdc13771f10ee521"
+            ]
+        ]
+    },
+    {
+        "id": "ddc58bf870072d31",
+        "type": "ui_button",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Datos Última HORA",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "hora",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 340,
+        "y": 600,
+        "wires": [
+            [
+                "05ec498e3d8a6e1a"
+            ]
+        ]
+    },
+    {
+        "id": "963877fdd14cdd4b",
+        "type": "ui_button",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Datos Última SEMANA",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "semana",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 340,
+        "y": 680,
+        "wires": [
+            [
+                "05ec498e3d8a6e1a"
+            ]
+        ]
+    },
+    {
+        "id": "a6c16de13ae40a62",
+        "type": "ui_button",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Datos Último MES",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "mes",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 330,
+        "y": 720,
+        "wires": [
+            [
+                "05ec498e3d8a6e1a"
+            ]
+        ]
+    },
+    {
+        "id": "14367b67eb505dd3",
+        "type": "ui_button",
+        "z": "f5791cc1f91c03bd",
+        "name": "",
+        "group": "e8ac12aa380cb87f",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Datos Último DÍA",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "dia",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 330,
+        "y": 640,
+        "wires": [
+            [
+                "05ec498e3d8a6e1a"
+            ]
+        ]
+    },
+    {
+        "id": "307fd17c0c57c204",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "Historico",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1580,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "fdc13771f10ee521",
+        "type": "debug",
+        "z": "f5791cc1f91c03bd",
+        "name": "Tipo Consulta",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "759329fc13f505d4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "c4d4bcf45ac11236",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "II12",
+        "name": ""
+    },
+    {
+        "id": "e8ac12aa380cb87f",
+        "type": "ui_group",
+        "name": "Consultas",
+        "tab": "0c21156c55c19a41",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f437324503dfedde",
+        "type": "ui_group",
+        "name": "Resultados (Consulta Intervalo)",
+        "tab": "0c21156c55c19a41",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "7f7053c6d90715af",
+        "type": "ui_group",
+        "name": "Gráficos (Consulta Rápida)",
+        "tab": "0c21156c55c19a41",
+        "order": 3,
+        "disp": true,
+        "width": "9",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0c21156c55c19a41",
+        "type": "ui_tab",
+        "name": "Base de Datos",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
