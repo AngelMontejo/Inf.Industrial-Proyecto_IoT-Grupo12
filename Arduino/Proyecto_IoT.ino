@@ -31,6 +31,7 @@ struct registro_datos    //Definimos una estructura de datos para guardar todos 
       float bateria;
       int valor_led;
       int valor_switch;
+      int valor_riego;
       char chipid[16];
       char SSId[16];
       int32_t rssi;
@@ -42,17 +43,20 @@ struct registro_datos    //Definimos una estructura de datos para guardar todos 
 int LED1 = 2;         //Pin del LED PWM
 int LED2 = 16;        //Pin del LED interruptor
 int LED_OTA = 2;      //Pin del LED usado durante la actualización FOTA
+int LED3 = 4;         //Pin del riego 
 int SENSOR = 5;       //Pin de datos del sensor
 
-//Variables de led:
+//Variables de actuadores:
 char ID_PLACA[16];        // Cadenas para ID de la placa
-float PWM_status;           // Variable que indica estado del LED1
-float PWM_actual;           // Variable que indica estado del LED1 durante cambios de intensidad
-float PWM_boton;         // Variable guarda valor PWM anterior oara el boton
-float PWM_anterior;         // Variable guarda valor PWM anterior
-float PWM_pub;
+float PWM_status;         // Variable que indica estado del LED1
+float PWM_actual;         // Variable que indica estado del LED1 durante cambios de intensidad
+float PWM_boton;          // Variable guarda valor PWM anterior oara el boton
+float PWM_anterior;       // Variable guarda valor PWM anterior
 int Switch_status;        // Variable que indica estado del LED2
 int Switch_anterior;      // Variable guarda valor SWITCH anterior
+int Riego_status;         // Variable que indica estado del riego
+unsigned long lastRiego=0; // Ultimo riego 
+
 
 //Variables de configuración
 int vel_envio=30;
@@ -62,6 +66,9 @@ int LED_logica=0;
 int SWITCH_logica=0;
 float T_MAX=50;
 float HUM_MAX=50;
+int T_RIEGO_ON=20;  //Minutos
+int T_RIEGO_OFF=3;  //Minutos
+
 
 //Variables botones
 #define BUTTON_PIN 0    // Definimos el pin correspondiente al boton en la placa
@@ -94,6 +101,8 @@ PubSubClient client(espClient);
   char topic_config[50];
   char topic_led_cmd[50];
   char topic_led_status[50];
+  char topic_riego_cmd[50];
+  char topic_riego_status[50];
   char topic_switch_cmd[50];
   char topic_switch_status[50];
   char topic_fota[50];
@@ -206,11 +215,13 @@ void reconnect() {
       client.publish(topic_datos, "Conexion al topic exitosa");           //Publicamos los datos del sensor en "II12/ID_PLACA/datos"
       client.publish(topic_led_status, "Conexion al topic exitosa");      //Publicamos el estado del LED2 en "II12/ID_PLACA/led/status"
       client.publish(topic_switch_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/switch/status"
+      client.publish(topic_riego_status, "Conexion al topic exitosa");   //Publicamos el estado del LED1 en "II12/ID_PLACA/riego/status"
        
       // ... and resubscribe
       client.subscribe(topic_config);       // Nos suscribimos al topic "II12/ID_PLACA/config" para obtener los parámetros de configuracion
       client.subscribe(topic_led_cmd);      // Nos suscribimos al topic "II12/ID_PLACA/led/cmd" para el control del LED2
       client.subscribe(topic_switch_cmd);   // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
+      client.subscribe(topic_riego_cmd);   // Nos suscribimos al topic "II12/ID_PLACA/switch/cmd" para el control del LED1
       client.subscribe(topic_fota);         // Nos suscribimos al topic "II12/ID_PLACA/FOTA" para comprobar las actualizaciones
       client.publish(topic_conexion,msg_on,true);       //Publicamos el estado de la conexión, mensaje retenido
         
@@ -288,6 +299,25 @@ void pub_msg_led(float PWM, char* origen, int id) {    //Funcion genera y public
     // Publicamos mensaje     
     client.publish(topic_led_status, msg_led);
 }
+//--------------------MENSAJE RIEGO----------------------------
+void pub_msg_riego(float Riego, char* origen, int id) {    //Funcion genera y publica mensaje de actualizacion del LED3 (solo para el pulsador)
+    // Genera mensaje para publicar
+    StaticJsonDocument<96> doc;
+    doc["CHIPID"] = ID_PLACA;
+    doc["Polaridad"]=LED_logica;
+    doc["RIEGO"] = Riego;
+    doc["origen"] = origen;
+    if(origen=="mqtt")
+    {
+      doc["id"] = id;
+    }
+    serializeJson(doc, msg_led);
+    //Mostramos mensaje:
+    Serial.print("Mensaje de confirmación de intensidad: ");
+    Serial.println(msg_led);
+    // Publicamos mensaje     
+    client.publish(topic_riego_status, msg_led);
+}
 //-------------------MENSAJE SWITCH----------------------
 void pub_msg_switch(int SWITCH, char* origen, int id)
 {
@@ -326,6 +356,7 @@ void pub_msg_datos(struct registro_datos misdatos)
     DHT11["Humedad"] = misdatos.hum;
     jsonRoot["LED"]=misdatos.valor_led;
     jsonRoot["SWITCH"]=misdatos.valor_switch;
+    jsonRoot["RIEGO"]=misdatos.valor_riego;
     JsonObject Wifi=jsonRoot.createNestedObject("Wifi");
     Wifi["SSID"]=misdatos.SSId;
     Wifi["IP"]=misdatos.ip;
@@ -370,6 +401,21 @@ void control_SWITCH(struct registro_datos misdatos)
     Switch_status=Switch_anterior;
   }
 }
+
+void control_RIEGO(struct registro_datos misdatos)
+{
+  if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*60*1000 & Riego_status==HIGH)
+  {
+    Riego_status=LOW;
+    lastRiego= millis();
+  }
+  else if((misdatos.tiempo-lastRiego)>T_RIEGO_ON*60*1000 & Riego_status==LOW)
+  {
+    Riego_status=HIGH;
+  }
+
+  
+}
 //-------------------PROCESAR MENSAJES----------------------------
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   
@@ -383,7 +429,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
   // MENSAJE: Configuración  
   if(strcmp(topic,topic_config)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado
   {
-      StaticJsonDocument<96> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
+      StaticJsonDocument<256> root;    // Indicamos el tamaño requerido para deserializar mensaje de configuracion
       // Deserialize the JSON document
       DeserializationError error = deserializeJson(root, mensaje,length);
 
@@ -402,6 +448,8 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
         T_MAX = root["T_MAX"];               // Temperatura maxima
         HUM_MAX = root["HUM_MAX"];           // Humedad máxima
+        T_RIEGO_OFF= root["T_RIEGO_OFF"];   // Tiempo de riego inactivo
+        T_RIEGO_ON = root["T_RIEGO_ON"];    // Tiempo de riego activo
         
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
@@ -458,24 +506,7 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         // Cuando cambie el valor de la intensidad del led enviamos un mensaje.
          if(PWM_anterior != PWM_status)
          {
-          pub_msg_led(PWM_status,"mqtt",id);
-//          // Genera mensaje para publicar
-//          StaticJsonDocument<128> doc;
-//
-//          doc["CHIPID"] = ID_PLACA;
-//          doc["Polaridad"]=LED_logica;
-//          doc["LED"] = PWM_status;
-//          doc["origen"] = "mqtt";
-//          doc["id"] = id;
-//
-//          serializeJson(doc, msg_led);
-//          
-//          Serial.print("Mensaje de confirmación de intensidad: ");
-//          Serial.println(msg_led);
-//      
-//          // Publicamos mensaje     
-//          client.publish(topic_led_status, msg_led);
-    
+          pub_msg_led(PWM_status,"mqtt",id);   
           PWM_anterior = PWM_status; // Guarda nuevo valor en la variable para hacer control
          }        
       }
@@ -527,26 +558,48 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
                                               
         if(Switch_anterior!=Switch_status){
           pub_msg_switch(Switch_status,"mqtt",id);
-//          // Genera mensaje para publicar
-//          StaticJsonDocument<128> doc;
-//          doc["CHIPID"] = ID_PLACA;
-//          doc["Polaridad"]=SWITCH_logica;
-//          doc["SWITCH"] = Switch_status;
-//          doc["origen"] = "mqtt";
-//          doc["id"] = id;
-//          serializeJson(doc, msg_led);
-//          
-//          //Mostramos el mensaje
-//          Serial.print("Mensaje de confirmación de intensidad: ");
-//          Serial.println(msg_led);
-//  
-//          // Publicamos mensaje     
-//          client.publish(topic_switch_status, msg_led);
-
           Switch_anterior = Switch_status;   // Guarda nuevo valor en la variable global
         }
       }
       else  // En el mensaje no existe el campo "level"
+      {
+        Serial.print("Error : ");
+        Serial.println("\"level\" key not found in JSON");
+      }
+  }
+   //MENSAJE: Control LED Riego
+  else if(strcmp(topic,topic_riego_cmd)==0)   // Compara si el mensaje que llega es del mismo topic que el indicado.
+  {
+    // Variable Json para desearializar el mensaje
+    StaticJsonDocument<64> root;  // Indicamos el tamaño requerido para deserializar mensaje de comando del led
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(root, mensaje,length);
+
+    //Variables para operar:
+     int Riego_led; // Guarda contenido del campo "level" del mensaje
+     int id;        // Guarda el identificador del mensaje
+     
+    // Compruebo si no hubo error
+    if (error) {
+      Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error.
+      Serial.println(error.c_str());
+    }
+
+    else
+      if(root.containsKey("level"))    // Se comprueba si existe el campo "level"
+      { 
+        Riego_led = root["level"];    // Se guarda el contenido del campo "level" 
+        id = root["id"];               // Se guarda el contenido del campo "id"
+
+        // Se muestra info del mensaje
+        Serial.print("Mensaje OK, valor del switch = ");
+        Serial.println(Riego_led);
+        // Se configura la salida:
+        Riego_status=Riego_led;
+        //Publica el mensaje:
+        pub_msg_riego(Riego_status,"mqtt",id);
+      }
+       else  // En el mensaje no existe el campo "level"
       {
         Serial.print("Error : ");
         Serial.println("\"level\" key not found in JSON");
@@ -583,14 +636,18 @@ void setup() {
   
   pinMode(LED1, OUTPUT);      // Definimos el pin LED1 como un Output. Tambien se corresponde con LED_OTA
   pinMode(LED2, OUTPUT);      // Definimos el pin LED2 como un Output
-
+  pinMode(LED3, OUTPUT);      // Definimos el pin LED3 como un Output
+ 
   digitalWrite(LED1, HIGH);   // Inicialmente el LED1 está apagado. Tambien se corresponde con LED_OTA
   digitalWrite(LED2, HIGH);   // Inicialmente el LED2 está apagado.
+  digitalWrite(LED3, HIGH);   // Inicialmente el LED3 esta apagado.
+  
   // Inicializa variables controlan LEDs
   PWM_status=HIGH;
   PWM_anterior=HIGH;
   PWM_boton=HIGH;
   Switch_status=HIGH;
+  Riego_status=HIGH;
   
   Serial.begin(115200);       // Establecemos la velocidad del puerto serie
   
@@ -610,10 +667,9 @@ void setup() {
   button.begin(BUTTON_PIN);         // Pin del boton
   button.setLongClickTime(1000);    // Fijamos tiempo del long click
   button.setDoubleClickTime(400);   // Fijamos tiempo entre doble click
-  Serial.println(" Longpress Time: " + String(button.getLongClickTime()) + "ms");
-  Serial.println(" DoubleClick Time: " + String(button.getDoubleClickTime()) + "ms");
+
  
-    // Funciones manejadoras:
+  // Funciones manejadoras:
   button.setPressedHandler(pressed);                      // Boton pulsado
   button.setReleasedHandler(released);                    // Boton liberado
   button.setClickHandler(click);                          // Single click
@@ -630,6 +686,8 @@ void setup() {
   sprintf(topic_led_status, "II12/%s/led/status",ID_PLACA);
   sprintf(topic_switch_cmd, "II12/%s/switch/cmd",ID_PLACA);
   sprintf(topic_switch_status, "II12/%s/switch/status",ID_PLACA);
+  sprintf(topic_riego_cmd, "II12/%s/riego/cmd",ID_PLACA);
+  sprintf(topic_riego_status, "II12/%s/riego/status",ID_PLACA);
   sprintf(topic_fota, "II12/%s/FOTA",ID_PLACA);
   
  
@@ -671,7 +729,9 @@ void loop() {
   //Control SITCH en funcion de la humedad:
   misdatos.hum = dht.getHumidity();        // Datos de humedad.
   control_SWITCH(misdatos);
-
+  //Control de Riego en función del tiempo:
+  control_RIEGO(misdatos);
+  
 //MENSAJE DE DATOS----------------
   // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
@@ -689,13 +749,14 @@ void loop() {
     // Actualizamos valores de los leds 
     misdatos.valor_led = PWM_status;
     misdatos.valor_switch = Switch_status;
+    misdatos.valor_riego = Riego_status;
 
     //Publicamos el mensaje:
     pub_msg_datos(misdatos);
   }
 
 //ACTUADORES---------------------------
-  if(PWM_actual!=PWM_status)
+  if(abs(PWM_actual-PWM_status)>1)
   {
       delay(vel_PWM);
       if(PWM_actual>PWM_status){
