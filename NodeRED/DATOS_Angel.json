@@ -1,0 +1,3432 @@
+[
+    {
+        "id": "3fbedf38893c4579",
+        "type": "tab",
+        "label": "DATOS SENSORES",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8bbc3d2f3084bea3",
+        "type": "mqtt in",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "topic": "II12/+/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 230,
+        "y": 1300,
+        "wires": [
+            [
+                "294db714f77a1c53"
+            ]
+        ]
+    },
+    {
+        "id": "a80f5241faa59df8",
+        "type": "mqtt in",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "topic": "II12/+/conexion",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 320,
+        "y": 260,
+        "wires": [
+            [
+                "9ba7c1f298bb733b"
+            ]
+        ]
+    },
+    {
+        "id": "7caefebbb2321598",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "fb2ae3223db9b869",
+        "type": "comment",
+        "z": "3fbedf38893c4579",
+        "name": "Estado de conexión del dispositivo",
+        "info": "",
+        "x": 380,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "bed5f3a952a6eb92",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "SSID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.SSID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 930,
+        "y": 2400,
+        "wires": [
+            [
+                "dbf6a3e15b07dc69"
+            ]
+        ]
+    },
+    {
+        "id": "dd2672e80d630e6e",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "Local IP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.IP",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 860,
+        "y": 2700,
+        "wires": [
+            [
+                "14fc5c6e845508ad"
+            ]
+        ]
+    },
+    {
+        "id": "14922413773aaa77",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "temp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.DHT11.Temperatura",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 910,
+        "y": 1120,
+        "wires": [
+            [
+                "278ca1dfbead1985"
+            ]
+        ]
+    },
+    {
+        "id": "a910c20b32b06d2d",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "hum",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.DHT11.Humedad",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 890,
+        "y": 1560,
+        "wires": [
+            [
+                "c82e2b92214a6788"
+            ]
+        ]
+    },
+    {
+        "id": "131f5ba2cee47000",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "uptime",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Uptime",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 950,
+        "y": 1920,
+        "wires": [
+            [
+                "388db0740b132712"
+            ]
+        ]
+    },
+    {
+        "id": "3c8d8fbb3c49712f",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "vcc",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Vcc",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Bateria",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 890,
+        "y": 900,
+        "wires": [
+            [
+                "9ce252bcf5bc9a1f"
+            ]
+        ]
+    },
+    {
+        "id": "8ef1ccf775446958",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "e20de913ef3087fd",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1220,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "520952ebf070dcf3",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "b1ce69b71176e335",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1350,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "6ab6b469017538f4",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "e20de913ef3087fd",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 1860,
+        "wires": []
+    },
+    {
+        "id": "51fbb91c02a4758d",
+        "type": "comment",
+        "z": "3fbedf38893c4579",
+        "name": "Datos de los sensores",
+        "info": "",
+        "x": 200,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "9ba7c1f298bb733b",
+        "type": "json",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 550,
+        "y": 260,
+        "wires": [
+            [
+                "7caefebbb2321598",
+                "8884aae8c34d98e5"
+            ]
+        ]
+    },
+    {
+        "id": "959465636ece44f3",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "b1ce69b71176e335",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1920,
+        "y": 1140,
+        "wires": [
+            [
+                "afb4da8b90093e84"
+            ]
+        ]
+    },
+    {
+        "id": "b9d529742f895107",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "e20de913ef3087fd",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1280,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5bf6ff8e72c43a7c",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "datos",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "294db714f77a1c53",
+        "type": "json",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 470,
+        "y": 1300,
+        "wires": [
+            [
+                "5bf6ff8e72c43a7c",
+                "c7e87a0641694dec"
+            ]
+        ]
+    },
+    {
+        "id": "c7e87a0641694dec",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "identificador",
+                "pt": "msg",
+                "to": "payload.CHIPID",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "ID1",
+                "pt": "msg",
+                "to": "ID1",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID2",
+                "pt": "msg",
+                "to": "ID2",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID3",
+                "pt": "msg",
+                "to": "ID3",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID4",
+                "pt": "msg",
+                "to": "ID4",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 1300,
+        "wires": [
+            [
+                "3c8d8fbb3c49712f",
+                "14922413773aaa77",
+                "a910c20b32b06d2d",
+                "131f5ba2cee47000",
+                "065a48b966936887",
+                "bed5f3a952a6eb92",
+                "dd2672e80d630e6e"
+            ]
+        ]
+    },
+    {
+        "id": "8884aae8c34d98e5",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "payload.online",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "true",
+                "vt": "jsonata"
+            },
+            {
+                "t": "eq",
+                "v": "false",
+                "vt": "jsonata"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 930,
+        "y": 260,
+        "wires": [
+            [
+                "72828087e2a23bd2",
+                "bcf17d8936adec26"
+            ],
+            [
+                "d7ef0e799fb55776",
+                "1393306da8183a92"
+            ]
+        ]
+    },
+    {
+        "id": "72828087e2a23bd2",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "SetUp ID",
+        "func": "var CHIPID = msg.payload.CHIPID;\nmsg.payload={};\nmsg.payload=true;\nif (global.get(\"ID1\")==-1)\n{\n    global.set(\"ID1\",CHIPID)\n}\nelse if (global.get(\"ID2\")==-1 & CHIPID!=global.get(\"ID1\"))\n{\n    global.set(\"ID2\",CHIPID)\n}\nelse if (global.get(\"ID3\")==-1 & CHIPID!=global.get(\"ID2\"))\n{\n    global.set(\"ID3\",CHIPID)\n}\nelse if (global.get(\"ID4\")==-1 & CHIPID!=global.get(\"ID3\"))\n{\n    global.set(\"ID4\",CHIPID)\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 180,
+        "wires": [
+            [
+                "f0da742ae17454f4",
+                "d18af8cf2b10de9b"
+            ]
+        ]
+    },
+    {
+        "id": "278d6d7eb24ddf68",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 490,
+        "y": 120,
+        "wires": [
+            [
+                "8884aae8c34d98e5",
+                "7caefebbb2321598"
+            ]
+        ]
+    },
+    {
+        "id": "d7ef0e799fb55776",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "Borra ID",
+        "func": "var CHIPID = msg.payload.CHIPID;\n\nif (global.get(\"ID1\")==CHIPID)\n{\n    global.set(\"ID1\",-1)\n}\nif (global.get(\"ID2\")==CHIPID)\n{\n    global.set(\"ID2\",-1)\n}\nif (global.get(\"ID3\")==CHIPID)\n{\n    global.set(\"ID3\",-1)\n}\nif (global.get(\"ID4\")==CHIPID)\n{\n    global.set(\"ID4\",-1)\n}\nmsg.payload={};\nmsg.payload=true;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 280,
+        "wires": [
+            [
+                "0e6284ff38f09330",
+                "4aa1f97f3f4244d3"
+            ]
+        ]
+    },
+    {
+        "id": "9ce252bcf5bc9a1f",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1040,
+        "y": 900,
+        "wires": [
+            [
+                "b9d529742f895107",
+                "8ef1ccf775446958",
+                "4260bbec65a46362"
+            ],
+            [
+                "ef29f9a44299ed8d",
+                "c07f10a3c732a834",
+                "ac216fa33f70e5b6"
+            ],
+            [
+                "72d16a6326ed8261",
+                "7663d04bde0ac402",
+                "5050ee6922879b06"
+            ],
+            [
+                "c161e7ef14ee71ed",
+                "c8870415652be7ad",
+                "c21383217db51a41"
+            ]
+        ]
+    },
+    {
+        "id": "70102689cf0ddfbd",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"Uptime\":180006,\"Vcc\":3041,\"DHT11\":{\"Temperatura\":null,\"Humedad\":null},\"LED\":1,\"SWITCH\":1,\"Wifi\":{\"SSID\":\"HUAWEI P20 lite\",\"IP\":\"192.168.221.144\",\"RSSI\":-32}}",
+        "payloadType": "str",
+        "x": 280,
+        "y": 1140,
+        "wires": [
+            [
+                "294db714f77a1c53"
+            ]
+        ]
+    },
+    {
+        "id": "b993c244982d4445",
+        "type": "comment",
+        "z": "3fbedf38893c4579",
+        "name": "Configuracion ID",
+        "info": "",
+        "x": 830,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "c07f10a3c732a834",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b1ce69b71176e335",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1560,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "ef29f9a44299ed8d",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "b1ce69b71176e335",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1620,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7663d04bde0ac402",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "6ca7216d8ea27f33",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1560,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "72d16a6326ed8261",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "6ca7216d8ea27f33",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1616.4921875,
+        "y": 872.4765625,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c8870415652be7ad",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "5e09d3243e79f2cb",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1200,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "c161e7ef14ee71ed",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "5e09d3243e79f2cb",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1260,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "278ca1dfbead1985",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1090,
+        "y": 1120,
+        "wires": [
+            [
+                "17d9a213ccfe9e0b",
+                "4cd2dcf87830665d",
+                "b677f683b7e49a48"
+            ],
+            [
+                "520952ebf070dcf3",
+                "af19cb9e41da84a7",
+                "b1f5ddaee6fac2fc"
+            ],
+            [
+                "304c6b767d77f42b",
+                "03fef5f638f3faf4",
+                "a2dcf449c924f1f3"
+            ],
+            [
+                "41a8bfa90cc5eede",
+                "0a7a89b9370d6462",
+                "deb804999a5df824"
+            ]
+        ]
+    },
+    {
+        "id": "17d9a213ccfe9e0b",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "e20de913ef3087fd",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1270,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "41a8bfa90cc5eede",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "5e09d3243e79f2cb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1270,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "304c6b767d77f42b",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "6ca7216d8ea27f33",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1350,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "c82e2b92214a6788",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1090,
+        "y": 1560,
+        "wires": [
+            [
+                "c207e5a13906a470",
+                "53649cc2a52a3a0d",
+                "900fc3722702cb79"
+            ],
+            [
+                "4f68cb623e1fe1aa",
+                "90a8ef66304012be",
+                "68ea998a918f0e69"
+            ],
+            [
+                "02deccd68bfbd637",
+                "c5129fddc40940db",
+                "ce5c8868c679bb06"
+            ],
+            [
+                "abb7bcceae4f3f5a",
+                "bf1ee0080b956ea9",
+                "264c705af4bf8aa6"
+            ]
+        ]
+    },
+    {
+        "id": "4f68cb623e1fe1aa",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "b1ce69b71176e335",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "c207e5a13906a470",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "e20de913ef3087fd",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "abb7bcceae4f3f5a",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "5e09d3243e79f2cb",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "02deccd68bfbd637",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "6ca7216d8ea27f33",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "869d7ed277b82331",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "e20de913ef3087fd",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1920,
+        "y": 1080,
+        "wires": [
+            [
+                "98e1d7e831905988"
+            ]
+        ]
+    },
+    {
+        "id": "e57e1f03fc453fe9",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "5e09d3243e79f2cb",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1920,
+        "y": 1380,
+        "wires": [
+            [
+                "ed5257dd1828bb3e"
+            ]
+        ]
+    },
+    {
+        "id": "7bfaad0f6c3caf64",
+        "type": "ui_chart",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "6ca7216d8ea27f33",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1920,
+        "y": 1320,
+        "wires": [
+            [
+                "25449502d7e2efd0"
+            ]
+        ]
+    },
+    {
+        "id": "d3de34cccc982141",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1250,
+        "y": 1920,
+        "wires": [
+            [
+                "6ab6b469017538f4",
+                "ddda1593ddd06e1d"
+            ],
+            [
+                "c3268bc50e10b4c1",
+                "183150d420e8cbc1"
+            ],
+            [
+                "c61df8f6abbd516c",
+                "a62cde7cc54da873"
+            ],
+            [
+                "7d65ba154edd77a7",
+                "3acd9914313b2a2f"
+            ]
+        ]
+    },
+    {
+        "id": "388db0740b132712",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "func": "var timestamp = msg.payload;\nvar date = new Date(timestamp);\nmsg.payload={};\nvar mes=-1;\n\nif(date.getDate()==1)\n{\n    mes = mes+1;\n}\n\nvar dia = date.getDate() + 30*mes -1;\n\nmsg.payload=\"Dias: \"+dia+\"  Horas: \"+date.getHours()+\":\"+date.getMinutes()+\":\"+date.getSeconds();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 1920,
+        "wires": [
+            [
+                "d3de34cccc982141"
+            ]
+        ]
+    },
+    {
+        "id": "c3268bc50e10b4c1",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b1ce69b71176e335",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 1900,
+        "wires": []
+    },
+    {
+        "id": "c61df8f6abbd516c",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "6ca7216d8ea27f33",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 1940,
+        "wires": []
+    },
+    {
+        "id": "7d65ba154edd77a7",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "5e09d3243e79f2cb",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 1980,
+        "wires": []
+    },
+    {
+        "id": "1cc05805eab632eb",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "507fef77796542ce",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1310,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "7aecb5714c5bea31",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "1a9a37c9f741c9a0",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1310,
+        "y": 2180,
+        "wires": []
+    },
+    {
+        "id": "4211be1d297f3dfa",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b8fb6ca8e030d95c",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1310,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "6eed878916273cf9",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "34223894a97402bd",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1310,
+        "y": 2280,
+        "wires": []
+    },
+    {
+        "id": "0f1b3ef27b5a102e",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1130,
+        "y": 2220,
+        "wires": [
+            [
+                "1cc05805eab632eb",
+                "2294021fdba900b8"
+            ],
+            [
+                "7aecb5714c5bea31",
+                "2294021fdba900b8"
+            ],
+            [
+                "4211be1d297f3dfa",
+                "2294021fdba900b8"
+            ],
+            [
+                "6eed878916273cf9",
+                "2294021fdba900b8"
+            ]
+        ]
+    },
+    {
+        "id": "00f68b318ee08a82",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "507fef77796542ce",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 2340,
+        "wires": []
+    },
+    {
+        "id": "8fe00a9cbfb3e499",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "1a9a37c9f741c9a0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 1290,
+        "y": 2380,
+        "wires": []
+    },
+    {
+        "id": "c54f543e843575cb",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b8fb6ca8e030d95c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 2440,
+        "wires": []
+    },
+    {
+        "id": "1d6bbabbe471e02b",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "34223894a97402bd",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 2480,
+        "wires": []
+    },
+    {
+        "id": "dbf6a3e15b07dc69",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1130,
+        "y": 2420,
+        "wires": [
+            [
+                "00f68b318ee08a82",
+                "20afa9d425fd832a"
+            ],
+            [
+                "8fe00a9cbfb3e499",
+                "20afa9d425fd832a"
+            ],
+            [
+                "c54f543e843575cb",
+                "20afa9d425fd832a"
+            ],
+            [
+                "1d6bbabbe471e02b",
+                "20afa9d425fd832a"
+            ]
+        ]
+    },
+    {
+        "id": "065a48b966936887",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.RSSI",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 2220,
+        "wires": [
+            [
+                "0f1b3ef27b5a102e"
+            ]
+        ]
+    },
+    {
+        "id": "03ef2a4f5a102247",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "507fef77796542ce",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1300,
+        "y": 2620,
+        "wires": []
+    },
+    {
+        "id": "02f6e02edaea6571",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "1a9a37c9f741c9a0",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 1300,
+        "y": 2660,
+        "wires": []
+    },
+    {
+        "id": "6c00bcdb4c91966e",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b8fb6ca8e030d95c",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1300,
+        "y": 2720,
+        "wires": []
+    },
+    {
+        "id": "f1e04016c45daf85",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "34223894a97402bd",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1300,
+        "y": 2760,
+        "wires": []
+    },
+    {
+        "id": "14fc5c6e845508ad",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1130,
+        "y": 2700,
+        "wires": [
+            [
+                "03ef2a4f5a102247",
+                "bc2ed043af23022a"
+            ],
+            [
+                "02f6e02edaea6571",
+                "bc2ed043af23022a"
+            ],
+            [
+                "6c00bcdb4c91966e",
+                "bc2ed043af23022a"
+            ],
+            [
+                "f1e04016c45daf85",
+                "bc2ed043af23022a"
+            ]
+        ]
+    },
+    {
+        "id": "bcf17d8936adec26",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ver id2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "1393306da8183a92",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "f0da742ae17454f4",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ver id",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "98e1d7e831905988",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp1\")\nvar hum=global.get(\"hum1\")\nvar TempAlarma=global.get(\"TempAlarma1\")\nvar HumAlarma=global.get(\"HumAlarma1\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 1: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 1: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2180,
+        "y": 1080,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "afb4da8b90093e84",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp2\")\nvar hum=global.get(\"hum2\")\nvar TempAlarma=global.get(\"TempAlarma2\")\nvar HumAlarma=global.get(\"HumAlarma2\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 2: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 2: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2180,
+        "y": 1140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "25449502d7e2efd0",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp3\")\nvar hum=global.get(\"hum3\")\nvar TempAlarma=global.get(\"TempAlarma3\")\nvar HumAlarma=global.get(\"HumAlarma3\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 3: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 3: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2180,
+        "y": 1320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ed5257dd1828bb3e",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp4\")\nvar hum=global.get(\"hum4\")\nvar TempAlarma=global.get(\"TempAlarma4\")\nvar HumAlarma=global.get(\"HumAlarma4\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 2: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 2: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2180,
+        "y": 1380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4cd2dcf87830665d",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1040,
+        "wires": [
+            [
+                "869d7ed277b82331"
+            ]
+        ]
+    },
+    {
+        "id": "af19cb9e41da84a7",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1140,
+        "wires": [
+            [
+                "959465636ece44f3"
+            ]
+        ]
+    },
+    {
+        "id": "03fef5f638f3faf4",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1280,
+        "wires": [
+            [
+                "7bfaad0f6c3caf64"
+            ]
+        ]
+    },
+    {
+        "id": "0a7a89b9370d6462",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1420,
+        "wires": [
+            [
+                "e57e1f03fc453fe9"
+            ]
+        ]
+    },
+    {
+        "id": "53649cc2a52a3a0d",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1080,
+        "wires": [
+            [
+                "869d7ed277b82331"
+            ]
+        ]
+    },
+    {
+        "id": "90a8ef66304012be",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1180,
+        "wires": [
+            [
+                "959465636ece44f3"
+            ]
+        ]
+    },
+    {
+        "id": "c5129fddc40940db",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1320,
+        "wires": [
+            [
+                "7bfaad0f6c3caf64"
+            ]
+        ]
+    },
+    {
+        "id": "bf1ee0080b956ea9",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1570,
+        "y": 1380,
+        "wires": [
+            [
+                "e57e1f03fc453fe9"
+            ]
+        ]
+    },
+    {
+        "id": "7be74d37cfbc74f2",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "Consulta ID1",
+        "func": "msg.payload=global.get(\"ID1\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 800,
+        "wires": [
+            [
+                "830740bcf036abb2"
+            ]
+        ]
+    },
+    {
+        "id": "c6575d2c92d5054d",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 800,
+        "wires": [
+            [
+                "7be74d37cfbc74f2"
+            ]
+        ]
+    },
+    {
+        "id": "830740bcf036abb2",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ID1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "f3f9a0875a2e4858",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "Consulta ID2",
+        "func": "msg.payload=global.get(\"ID2\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 860,
+        "wires": [
+            [
+                "e9467f4004f503d0"
+            ]
+        ]
+    },
+    {
+        "id": "6f0bb9e42939fe2d",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 860,
+        "wires": [
+            [
+                "f3f9a0875a2e4858"
+            ]
+        ]
+    },
+    {
+        "id": "e9467f4004f503d0",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ID2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "ac659fc8db4b74f7",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "Consulta ID3",
+        "func": "msg.payload=global.get(\"ID3\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 920,
+        "wires": [
+            [
+                "8577f2e34ee36cd5"
+            ]
+        ]
+    },
+    {
+        "id": "26cfdd47dd9085a0",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 920,
+        "wires": [
+            [
+                "ac659fc8db4b74f7"
+            ]
+        ]
+    },
+    {
+        "id": "8577f2e34ee36cd5",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ID3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "e57c5a8470fc84d2",
+        "type": "function",
+        "z": "3fbedf38893c4579",
+        "name": "Consulta ID4",
+        "func": "msg.payload=global.get(\"ID4\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 980,
+        "wires": [
+            [
+                "327a67e241accc14"
+            ]
+        ]
+    },
+    {
+        "id": "164300bcd3af076b",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 980,
+        "wires": [
+            [
+                "e57c5a8470fc84d2"
+            ]
+        ]
+    },
+    {
+        "id": "327a67e241accc14",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "ID4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "0e6284ff38f09330",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "85ec6473f7bbe32c",
+        "type": "config",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "properties": [
+            {
+                "p": "ID1",
+                "pt": "global",
+                "to": "-1",
+                "tot": "num"
+            },
+            {
+                "p": "ID2",
+                "pt": "global",
+                "to": "-1",
+                "tot": "num"
+            },
+            {
+                "p": "ID3",
+                "pt": "global",
+                "to": "-1",
+                "tot": "num"
+            },
+            {
+                "p": "ID4",
+                "pt": "global",
+                "to": "-1",
+                "tot": "num"
+            }
+        ],
+        "active": true,
+        "x": 280,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "bc2ed043af23022a",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "f56656d5721ef152",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1580,
+        "y": 2700,
+        "wires": []
+    },
+    {
+        "id": "20afa9d425fd832a",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "f56656d5721ef152",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1470,
+        "y": 2420,
+        "wires": []
+    },
+    {
+        "id": "2294021fdba900b8",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "f56656d5721ef152",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1530,
+        "y": 2220,
+        "wires": []
+    },
+    {
+        "id": "ddda1593ddd06e1d",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "78a1f92e52802893",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 2020,
+        "wires": []
+    },
+    {
+        "id": "183150d420e8cbc1",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "aefc71834b3dcb7f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "a62cde7cc54da873",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "f2c5587fab9f701a",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "3acd9914313b2a2f",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "2d29f08d114f200d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1600,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "68ea998a918f0e69",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "aefc71834b3dcb7f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "900fc3722702cb79",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "78a1f92e52802893",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1680,
+        "wires": []
+    },
+    {
+        "id": "264c705af4bf8aa6",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "2d29f08d114f200d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1820,
+        "wires": []
+    },
+    {
+        "id": "ce5c8868c679bb06",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "f2c5587fab9f701a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1260,
+        "y": 1780,
+        "wires": []
+    },
+    {
+        "id": "b1f5ddaee6fac2fc",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "aefc71834b3dcb7f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1350,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "b677f683b7e49a48",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "78a1f92e52802893",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1270,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "deb804999a5df824",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "2d29f08d114f200d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1270,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "a2dcf449c924f1f3",
+        "type": "ui_gauge",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "group": "f2c5587fab9f701a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1350,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "4260bbec65a46362",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "78a1f92e52802893",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2000,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "ac216fa33f70e5b6",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "aefc71834b3dcb7f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2000,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "5050ee6922879b06",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "f2c5587fab9f701a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2000,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "c21383217db51a41",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "2d29f08d114f200d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 2000,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "d18af8cf2b10de9b",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "msg.payload.CHIPID",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1370,
+        "y": 160,
+        "wires": [
+            [
+                "2004133098b01257",
+                "66fdbe09f3acf0c1"
+            ],
+            [
+                "2a69ed92bd4ea703",
+                "8eb5aacc143cdcd2"
+            ],
+            [
+                "050b806996b0b5be",
+                "d615cb396224cef8"
+            ],
+            [
+                "0bcae2022f72df32",
+                "ce1b257dc7c29d9b"
+            ]
+        ]
+    },
+    {
+        "id": "66fdbe09f3acf0c1",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 2,
+        "group": "507fef77796542ce",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "2004133098b01257",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "507fef77796542ce",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Estado de Conexión: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1880,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "8eb5aacc143cdcd2",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 2,
+        "group": "1a9a37c9f741c9a0",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "2a69ed92bd4ea703",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "1a9a37c9f741c9a0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Estado de Conexión: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1880,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d615cb396224cef8",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 2,
+        "group": "b8fb6ca8e030d95c",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "050b806996b0b5be",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "b8fb6ca8e030d95c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Estado de Conexión: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1880,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ce1b257dc7c29d9b",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 2,
+        "group": "34223894a97402bd",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "0bcae2022f72df32",
+        "type": "ui_text",
+        "z": "3fbedf38893c4579",
+        "group": "34223894a97402bd",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Estado de Conexión: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1880,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "4aa1f97f3f4244d3",
+        "type": "switch",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "property": "msg.payload.CHIPID",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1390,
+        "y": 340,
+        "wires": [
+            [
+                "2004133098b01257",
+                "66fdbe09f3acf0c1"
+            ],
+            [
+                "2a69ed92bd4ea703",
+                "8eb5aacc143cdcd2"
+            ],
+            [
+                "050b806996b0b5be",
+                "d615cb396224cef8"
+            ],
+            [
+                "0bcae2022f72df32",
+                "ce1b257dc7c29d9b"
+            ]
+        ]
+    },
+    {
+        "id": "759329fc13f505d4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "e20de913ef3087fd",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "594cecd70ae88430",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b1ce69b71176e335",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "cb0a8f66055dc5e4",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6ca7216d8ea27f33",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "3ea480f31c69cc51",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "5e09d3243e79f2cb",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "56d00aae9c36eba0",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "507fef77796542ce",
+        "type": "ui_group",
+        "name": "Sistema",
+        "tab": "594cecd70ae88430",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1a9a37c9f741c9a0",
+        "type": "ui_group",
+        "name": "Sistema",
+        "tab": "cb0a8f66055dc5e4",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b8fb6ca8e030d95c",
+        "type": "ui_group",
+        "name": "Sistema",
+        "tab": "3ea480f31c69cc51",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "34223894a97402bd",
+        "type": "ui_group",
+        "name": "Sistema",
+        "tab": "56d00aae9c36eba0",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f56656d5721ef152",
+        "type": "ui_group",
+        "name": "Conexion",
+        "tab": "17ed4c3a57d6103c",
+        "order": 6,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "78a1f92e52802893",
+        "type": "ui_group",
+        "name": "HUERTO1",
+        "tab": "17ed4c3a57d6103c",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "aefc71834b3dcb7f",
+        "type": "ui_group",
+        "name": "HUERTO2",
+        "tab": "17ed4c3a57d6103c",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f2c5587fab9f701a",
+        "type": "ui_group",
+        "name": "HUERTO3",
+        "tab": "17ed4c3a57d6103c",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2d29f08d114f200d",
+        "type": "ui_group",
+        "name": "HUERTO4",
+        "tab": "17ed4c3a57d6103c",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "594cecd70ae88430",
+        "type": "ui_tab",
+        "name": "HUERTO 1",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cb0a8f66055dc5e4",
+        "type": "ui_tab",
+        "name": "HUERTO 2",
+        "icon": "dashboard",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "3ea480f31c69cc51",
+        "type": "ui_tab",
+        "name": "HUERTO 3",
+        "icon": "dashboard",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "56d00aae9c36eba0",
+        "type": "ui_tab",
+        "name": "HUERTO 4",
+        "icon": "dashboard",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "17ed4c3a57d6103c",
+        "type": "ui_tab",
+        "name": "HUERTO-GLOBAL",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
