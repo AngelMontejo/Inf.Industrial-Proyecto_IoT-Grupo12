@@ -1,0 +1,3145 @@
+[
+    {
+        "id": "2ad3025351b081ca",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2dc1537014da4231",
+        "type": "mqtt in",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "topic": "II12/+/datos",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 190,
+        "y": 980,
+        "wires": [
+            [
+                "54841401874c6d23"
+            ]
+        ]
+    },
+    {
+        "id": "dc96b8bd5ff3e7a9",
+        "type": "mqtt in",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "topic": "II12/+/conexion",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "759329fc13f505d4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 300,
+        "y": 300,
+        "wires": [
+            [
+                "7befb30b50a76f91"
+            ]
+        ]
+    },
+    {
+        "id": "74a4705ccfdbf392",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "02c91f210a37ef4b",
+        "type": "comment",
+        "z": "2ad3025351b081ca",
+        "name": "Estado de conexión del dispositivo",
+        "info": "",
+        "x": 360,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "c8ae588b3e528167",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "SSID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.SSID",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 910,
+        "y": 1580,
+        "wires": [
+            [
+                "6ecee5a8c0403abd"
+            ]
+        ]
+    },
+    {
+        "id": "f4587245e29b2ffb",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "Local IP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.IP",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 840,
+        "y": 1780,
+        "wires": [
+            [
+                "414c2e8206436390"
+            ]
+        ]
+    },
+    {
+        "id": "1141d8925f66fb23",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "temp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.DHT11.Temperatura",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 870,
+        "y": 800,
+        "wires": [
+            [
+                "acc8c72c3b3fed4f"
+            ]
+        ]
+    },
+    {
+        "id": "8a32095b739b41f5",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "hum",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.DHT11.Humedad",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 850,
+        "y": 1040,
+        "wires": [
+            [
+                "7b35247bbd585080"
+            ]
+        ]
+    },
+    {
+        "id": "b94b17d9d96a3193",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "uptime",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Uptime",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 850,
+        "y": 1220,
+        "wires": [
+            [
+                "5a4a163dd6065d52"
+            ]
+        ]
+    },
+    {
+        "id": "cddc61d35020ea11",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "vcc",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Vcc",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Bateria",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 850,
+        "y": 580,
+        "wires": [
+            [
+                "cc877d4f030d123d"
+            ]
+        ]
+    },
+    {
+        "id": "1f554166c1e9d3f0",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "b6b32993bb31411d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1180,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "3474dbe0a574c027",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "acf1deecb57fc041",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1310,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "e4a62cd0a5735294",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "b6b32993bb31411d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1500,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "126b864b9eec4c9e",
+        "type": "comment",
+        "z": "2ad3025351b081ca",
+        "name": "Datos de los sensores",
+        "info": "",
+        "x": 160,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "7befb30b50a76f91",
+        "type": "json",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 300,
+        "wires": [
+            [
+                "74a4705ccfdbf392",
+                "a7d6fa190b528107"
+            ]
+        ]
+    },
+    {
+        "id": "bbb4f6b8aad68a1a",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "acf1deecb57fc041",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1880,
+        "y": 820,
+        "wires": [
+            [
+                "eb0de8dd369279ec"
+            ]
+        ]
+    },
+    {
+        "id": "00294545c3a3bbc4",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "b6b32993bb31411d",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1240,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a9256c7b41290ec4",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "datos",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "54841401874c6d23",
+        "type": "json",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 430,
+        "y": 980,
+        "wires": [
+            [
+                "a9256c7b41290ec4",
+                "a00f4431ad6b9595"
+            ]
+        ]
+    },
+    {
+        "id": "a00f4431ad6b9595",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "identificador",
+                "pt": "msg",
+                "to": "payload.CHIPID",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "ID1",
+                "pt": "msg",
+                "to": "ID1",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID2",
+                "pt": "msg",
+                "to": "ID2",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID3",
+                "pt": "msg",
+                "to": "ID3",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "ID4",
+                "pt": "msg",
+                "to": "ID4",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 980,
+        "wires": [
+            [
+                "cddc61d35020ea11",
+                "1141d8925f66fb23",
+                "8a32095b739b41f5",
+                "b94b17d9d96a3193",
+                "03e9254badf5ae26",
+                "c8ae588b3e528167",
+                "f4587245e29b2ffb"
+            ]
+        ]
+    },
+    {
+        "id": "a7d6fa190b528107",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload.online",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "true",
+                "vt": "jsonata"
+            },
+            {
+                "t": "eq",
+                "v": "false",
+                "vt": "jsonata"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 910,
+        "y": 300,
+        "wires": [
+            [
+                "87fef345035b4e98",
+                "3cb2d3e241c13057"
+            ],
+            [
+                "d01047e9731573dd",
+                "bb177b8b9b321a23"
+            ]
+        ]
+    },
+    {
+        "id": "87fef345035b4e98",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "SetUp ID",
+        "func": "var CHIPID = msg.payload.CHIPID;\nmsg.payload={}\nif (global.get(\"ID1\")==-1)\n{\n    global.set(\"ID1\",CHIPID)\n}\nelse if (global.get(\"ID2\")==-1 & CHIPID!=global.get(\"ID1\"))\n{\n    global.set(\"ID2\",CHIPID)\n    msg.payload=\"dentro\"\n}\nelse if (global.get(\"ID3\")==-1 & CHIPID!=global.get(\"ID1\") & CHIPID!=global.get(\"ID2\"))\n{\n    global.set(\"ID3\",CHIPID)\n}\nelse if (global.get(\"ID4\")==-1 & CHIPID!=global.get(\"ID1\") & CHIPID!=global.get(\"ID2\") & CHIPID!=global.get(\"ID3\"))\n{\n    global.set(\"ID4\",CHIPID)\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 220,
+        "wires": [
+            [
+                "fcd918536a07b8ce"
+            ]
+        ]
+    },
+    {
+        "id": "13a156094a297d56",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 480,
+        "y": 220,
+        "wires": [
+            [
+                "a7d6fa190b528107",
+                "74a4705ccfdbf392"
+            ]
+        ]
+    },
+    {
+        "id": "d01047e9731573dd",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Borra ID",
+        "func": "var CHIPID = msg.payload.CHIPID;\n\nif (global.get(\"ID1\")==CHIPID)\n{\n    global.set(\"ID1\",-1)\n}\nif (global.get(\"ID2\")==CHIPID)\n{\n    global.set(\"ID2\",-1)\n}\nif (global.get(\"ID3\")==CHIPID)\n{\n    global.set(\"ID3\",-1)\n}\nif (global.get(\"ID4\")==CHIPID)\n{\n    global.set(\"ID4\",-1)\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 320,
+        "wires": [
+            [
+                "6144867f206f812d"
+            ]
+        ]
+    },
+    {
+        "id": "cc877d4f030d123d",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1000,
+        "y": 580,
+        "wires": [
+            [
+                "00294545c3a3bbc4",
+                "1f554166c1e9d3f0"
+            ],
+            [
+                "62fdcd5c778bc68f",
+                "41f4d6440541fdbc"
+            ],
+            [
+                "840a2209ead2f95a",
+                "f5c5cf467c738618"
+            ],
+            [
+                "80c6847459c81207",
+                "5d10b4c3a7e0f2ff"
+            ]
+        ]
+    },
+    {
+        "id": "3c9cd5ea0a613d08",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"Uptime\":180006,\"Vcc\":3041,\"DHT11\":{\"Temperatura\":null,\"Humedad\":null},\"LED\":1,\"SWITCH\":1,\"Wifi\":{\"SSID\":\"HUAWEI P20 lite\",\"IP\":\"192.168.221.144\",\"RSSI\":-32}}",
+        "payloadType": "str",
+        "x": 240,
+        "y": 820,
+        "wires": [
+            [
+                "54841401874c6d23"
+            ]
+        ]
+    },
+    {
+        "id": "5f5d3d43764ef20d",
+        "type": "comment",
+        "z": "2ad3025351b081ca",
+        "name": "Configuracion ID",
+        "info": "",
+        "x": 810,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "41f4d6440541fdbc",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "acf1deecb57fc041",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1520,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "62fdcd5c778bc68f",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "acf1deecb57fc041",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1580,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f5c5cf467c738618",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "25752c938ea6479f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1520,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "840a2209ead2f95a",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "25752c938ea6479f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1576.4921875,
+        "y": 552.4765625,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d10b4c3a7e0f2ff",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "f257929c5b963ec0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Batería:",
+        "format": "{{msg.payload}} mV",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1160,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "80c6847459c81207",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "f257929c5b963ec0",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica Batería",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "2500",
+        "ymax": "3500",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1220,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "acc8c72c3b3fed4f",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1050,
+        "y": 800,
+        "wires": [
+            [
+                "d13dd3199121892a",
+                "43373715fb1aa44c"
+            ],
+            [
+                "3474dbe0a574c027",
+                "613d04a18d449525"
+            ],
+            [
+                "27de209c44559b62",
+                "1105a06a4f2a6dd7"
+            ],
+            [
+                "b5fa650da5b52745",
+                "c2383ab08b75ccf2"
+            ]
+        ]
+    },
+    {
+        "id": "d13dd3199121892a",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "b6b32993bb31411d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1230,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "b5fa650da5b52745",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "f257929c5b963ec0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1230,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "27de209c44559b62",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "25752c938ea6479f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "ºC",
+        "format": "{{value}}",
+        "min": "-10",
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1310,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "7b35247bbd585080",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1050,
+        "y": 1040,
+        "wires": [
+            [
+                "4ea217b564f45bad",
+                "e2939ea9af1a9698"
+            ],
+            [
+                "0d7a86cd8a27d23c",
+                "47c265ccf1869036"
+            ],
+            [
+                "a14682852849fbf3",
+                "89d404d5317c092e"
+            ],
+            [
+                "bf30c550d4f6dd3b",
+                "3bac09ea6078b7ee"
+            ]
+        ]
+    },
+    {
+        "id": "0d7a86cd8a27d23c",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "acf1deecb57fc041",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1300,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "4ea217b564f45bad",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "b6b32993bb31411d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1220,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "bf30c550d4f6dd3b",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "f257929c5b963ec0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1220,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "a14682852849fbf3",
+        "type": "ui_gauge",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "25752c938ea6479f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Humedad",
+        "label": "%",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1300,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "fd03294c6d54d846",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "b6b32993bb31411d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1880,
+        "y": 760,
+        "wires": [
+            [
+                "d32bccf087a12bbd"
+            ]
+        ]
+    },
+    {
+        "id": "80ea631f54208548",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "f257929c5b963ec0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1880,
+        "y": 1060,
+        "wires": [
+            [
+                "70c14fa40508e704"
+            ]
+        ]
+    },
+    {
+        "id": "322d0d97ac163edc",
+        "type": "ui_chart",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "group": "25752c938ea6479f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "Evolucion Historica DHT11",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "2",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1880,
+        "y": 1000,
+        "wires": [
+            [
+                "9672eca66f963463"
+            ]
+        ]
+    },
+    {
+        "id": "050d319aa3792f48",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1150,
+        "y": 1220,
+        "wires": [
+            [
+                "e4a62cd0a5735294"
+            ],
+            [
+                "1eb793678c1b39a5"
+            ],
+            [
+                "8a669aa2e6a6c3e5"
+            ],
+            [
+                "150ff071a6d5380a"
+            ]
+        ]
+    },
+    {
+        "id": "5a4a163dd6065d52",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "func": "var timestamp = msg.payload;\nvar date = new Date(timestamp);\nmsg.payload={};\nvar mes=-1;\n\nif(date.getDate()==1)\n{\n    mes = mes+1;\n}\n\nvar dia = date.getDate() + 30*mes -1;\n\nmsg.payload=\"Dias: \"+dia+\"  Horas: \"+date.getHours()+\":\"+date.getMinutes()+\":\"+date.getSeconds();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 1220,
+        "wires": [
+            [
+                "050d319aa3792f48"
+            ]
+        ]
+    },
+    {
+        "id": "1eb793678c1b39a5",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "acf1deecb57fc041",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1500,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "8a669aa2e6a6c3e5",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "25752c938ea6479f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1500,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "150ff071a6d5380a",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "f257929c5b963ec0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Uptime:",
+        "format": "{{msg.payload}} ms",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1500,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "253eef30675cbed5",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "b6b32993bb31411d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "94a1bc51e827654f",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "acf1deecb57fc041",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "f1948ca512ed052d",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "25752c938ea6479f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "9a8484a8d65d9cec",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "f257929c5b963ec0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "RSSI actual:",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1290,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "f2deadcac0181b64",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1110,
+        "y": 1400,
+        "wires": [
+            [
+                "253eef30675cbed5"
+            ],
+            [
+                "94a1bc51e827654f"
+            ],
+            [
+                "f1948ca512ed052d"
+            ],
+            [
+                "9a8484a8d65d9cec"
+            ]
+        ]
+    },
+    {
+        "id": "6ac0afa1c7de6cb2",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "b6b32993bb31411d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1270,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "a361aad5431381cc",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "acf1deecb57fc041",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 1270,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "d64c4d3f77b0ddf7",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "25752c938ea6479f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1270,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "f2a7302411746b48",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "f257929c5b963ec0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "SSID",
+        "format": "{{msg.payload}} dBm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1270,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "6ecee5a8c0403abd",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1110,
+        "y": 1600,
+        "wires": [
+            [
+                "6ac0afa1c7de6cb2"
+            ],
+            [
+                "a361aad5431381cc"
+            ],
+            [
+                "d64c4d3f77b0ddf7"
+            ],
+            [
+                "f2a7302411746b48"
+            ]
+        ]
+    },
+    {
+        "id": "03e9254badf5ae26",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Wifi.RSSI",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 1400,
+        "wires": [
+            [
+                "f2deadcac0181b64"
+            ]
+        ]
+    },
+    {
+        "id": "0055c9c30add591f",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "b6b32993bb31411d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1280,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "8ff78ad0b1bdb541",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "acf1deecb57fc041",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "x": 1280,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "f431dab40ce833f3",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "25752c938ea6479f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local:",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1280,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "90886f1d5fbd32a2",
+        "type": "ui_text",
+        "z": "2ad3025351b081ca",
+        "group": "f257929c5b963ec0",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "IP local",
+        "format": "{{msg.payload}} ",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1280,
+        "y": 1840,
+        "wires": []
+    },
+    {
+        "id": "414c2e8206436390",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "identificador",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ID1",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID2",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID3",
+                "vt": "msg"
+            },
+            {
+                "t": "eq",
+                "v": "ID4",
+                "vt": "msg"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 1110,
+        "y": 1780,
+        "wires": [
+            [
+                "0055c9c30add591f"
+            ],
+            [
+                "8ff78ad0b1bdb541"
+            ],
+            [
+                "f431dab40ce833f3"
+            ],
+            [
+                "90886f1d5fbd32a2"
+            ]
+        ]
+    },
+    {
+        "id": "3cb2d3e241c13057",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ver id2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "bb177b8b9b321a23",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "fcd918536a07b8ce",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ver id",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d32bccf087a12bbd",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp1\")\nvar hum=global.get(\"hum1\")\nvar TempAlarma=global.get(\"TempAlarma1\")\nvar HumAlarma=global.get(\"HumAlarma1\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 1: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 1: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nif (msg.payload.content==undefined)\n{\n    msg.payload.longitud=0\n}\nelse\n{\n    var str=msg.payload.content\n    msg.payload.longitud=str.length\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2140,
+        "y": 760,
+        "wires": [
+            [
+                "61155bc7f0835fee"
+            ]
+        ]
+    },
+    {
+        "id": "eb0de8dd369279ec",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp2\")\nvar hum=global.get(\"hum2\")\nvar TempAlarma=global.get(\"TempAlarma2\")\nvar HumAlarma=global.get(\"HumAlarma2\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 2: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 2: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nif (msg.payload.content==undefined)\n{\n    msg.payload.longitud=0\n}\nelse\n{\n    var str=msg.payload.content\n    msg.payload.longitud=str.length\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2140,
+        "y": 820,
+        "wires": [
+            [
+                "9570b86a97f966b9"
+            ]
+        ]
+    },
+    {
+        "id": "9672eca66f963463",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp3\")\nvar hum=global.get(\"hum3\")\nvar TempAlarma=global.get(\"TempAlarma3\")\nvar HumAlarma=global.get(\"HumAlarma3\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 3: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 3: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nif (msg.payload.content==undefined)\n{\n    msg.payload.longitud=0\n}\nelse\n{\n    var str=msg.payload.content\n    msg.payload.longitud=str.length\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2140,
+        "y": 1000,
+        "wires": [
+            [
+                "7847b9dea8475376"
+            ]
+        ]
+    },
+    {
+        "id": "70c14fa40508e704",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "mensaje alarma",
+        "func": "msg.payload={}\nmsg.topic=\"telegram\"\nmsg.payload.chatId=global.get(\"chatID\")\nmsg.payload.type=\"message\"\nvar temp=global.get(\"temp4\")\nvar hum=global.get(\"hum4\")\nvar TempAlarma=global.get(\"TempAlarma4\")\nvar HumAlarma=global.get(\"HumAlarma4\")\nif (temp>TempAlarma)\n{\n    msg.payload.content=\"HUERTO 2: TEMPERATURA EXCESIVAMENTE ALTA\"\n    if (hum>HumAlarma)\n    {\n        msg.payload.content=msg.payload.content+\"\\nHUMEDAD EXCESIVAMENTE ALTA\"\n    }\n}\nelse if (hum>HumAlarma)\n{\n    msg.payload.content=\"HUERTO 2: HUMEDAD EXCESIVAMENTE ALTA\"\n}\n\nif (msg.payload.content==undefined)\n{\n    msg.payload.longitud=0\n}\nelse\n{\n    var str=msg.payload.content\n    msg.payload.longitud=str.length\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2140,
+        "y": 1060,
+        "wires": [
+            [
+                "de860e8755e2303e"
+            ]
+        ]
+    },
+    {
+        "id": "ee98e00107d9d8c7",
+        "type": "telegram sender",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "bot": "b2cc055e98302147",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 2730,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "43373715fb1aa44c",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp1",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 720,
+        "wires": [
+            [
+                "fd03294c6d54d846"
+            ]
+        ]
+    },
+    {
+        "id": "613d04a18d449525",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp2",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 820,
+        "wires": [
+            [
+                "bbb4f6b8aad68a1a"
+            ]
+        ]
+    },
+    {
+        "id": "1105a06a4f2a6dd7",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp3",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 960,
+        "wires": [
+            [
+                "322d0d97ac163edc"
+            ]
+        ]
+    },
+    {
+        "id": "c2383ab08b75ccf2",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp4",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperatura",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 1100,
+        "wires": [
+            [
+                "80ea631f54208548"
+            ]
+        ]
+    },
+    {
+        "id": "e2939ea9af1a9698",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hum1",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 760,
+        "wires": [
+            [
+                "fd03294c6d54d846"
+            ]
+        ]
+    },
+    {
+        "id": "47c265ccf1869036",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hum2",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 860,
+        "wires": [
+            [
+                "bbb4f6b8aad68a1a"
+            ]
+        ]
+    },
+    {
+        "id": "89d404d5317c092e",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hum3",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 1000,
+        "wires": [
+            [
+                "322d0d97ac163edc"
+            ]
+        ]
+    },
+    {
+        "id": "3bac09ea6078b7ee",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hum4",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "humedad",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1540,
+        "y": 1060,
+        "wires": [
+            [
+                "80ea631f54208548"
+            ]
+        ]
+    },
+    {
+        "id": "fc227a3576026dee",
+        "type": "ui_numeric",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "label": "HumAlarma",
+        "tooltip": "",
+        "group": "03b5bf71738e3f11",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": "40",
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 1870,
+        "y": 880,
+        "wires": [
+            [
+                "08b5491d5ead91b2"
+            ]
+        ]
+    },
+    {
+        "id": "1810e513942f8c54",
+        "type": "ui_numeric",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "label": "TempAlarma",
+        "tooltip": "",
+        "group": "03b5bf71738e3f11",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": "20",
+        "max": "50",
+        "step": 1,
+        "className": "",
+        "x": 1870,
+        "y": 940,
+        "wires": [
+            [
+                "019ae7fdb5472482"
+            ]
+        ]
+    },
+    {
+        "id": "019ae7fdb5472482",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "TempAlarma",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2100,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "08b5491d5ead91b2",
+        "type": "change",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "HumAlarma",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2100,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a5be20bb7d3981a8",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID1",
+        "func": "msg.payload=global.get(\"ID1\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 480,
+        "wires": [
+            [
+                "e4393086f033da9e"
+            ]
+        ]
+    },
+    {
+        "id": "8d24edfd6db8acec",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 480,
+        "wires": [
+            [
+                "a5be20bb7d3981a8"
+            ]
+        ]
+    },
+    {
+        "id": "e4393086f033da9e",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "037025e404377a8e",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID2",
+        "func": "msg.payload=global.get(\"ID2\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 540,
+        "wires": [
+            [
+                "8e05bdb316843383"
+            ]
+        ]
+    },
+    {
+        "id": "6823a68e602a1251",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 540,
+        "wires": [
+            [
+                "037025e404377a8e"
+            ]
+        ]
+    },
+    {
+        "id": "8e05bdb316843383",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "d94426460d8a5d5d",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID3",
+        "func": "msg.payload=global.get(\"ID3\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 600,
+        "wires": [
+            [
+                "1bdc4362ef0e6e45"
+            ]
+        ]
+    },
+    {
+        "id": "675f438b1f0e7bbc",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 600,
+        "wires": [
+            [
+                "d94426460d8a5d5d"
+            ]
+        ]
+    },
+    {
+        "id": "1bdc4362ef0e6e45",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "9b02ed7381d9d858",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID4",
+        "func": "msg.payload=global.get(\"ID4\")\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 660,
+        "wires": [
+            [
+                "5a1c5abc1ab6d5c1"
+            ]
+        ]
+    },
+    {
+        "id": "ff81fe35f56e6655",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 250,
+        "y": 660,
+        "wires": [
+            [
+                "9b02ed7381d9d858"
+            ]
+        ]
+    },
+    {
+        "id": "5a1c5abc1ab6d5c1",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "6144867f206f812d",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "Conexion",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1280,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "a67c49a16ce8910e",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID1",
+        "func": "global.set(\"ID1\",-1)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2130,
+        "y": 200,
+        "wires": [
+            [
+                "99041d349b58635e"
+            ]
+        ]
+    },
+    {
+        "id": "1749000fc8ccb8b9",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 1950,
+        "y": 200,
+        "wires": [
+            [
+                "a67c49a16ce8910e"
+            ]
+        ]
+    },
+    {
+        "id": "99041d349b58635e",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2310,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "94081cb40030e3b8",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID2",
+        "func": "global.set(\"ID2\",-1)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2130,
+        "y": 260,
+        "wires": [
+            [
+                "f043f011f80d0eb2"
+            ]
+        ]
+    },
+    {
+        "id": "80e1126c0e3557a7",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 1950,
+        "y": 260,
+        "wires": [
+            [
+                "94081cb40030e3b8"
+            ]
+        ]
+    },
+    {
+        "id": "f043f011f80d0eb2",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2310,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "1334ad0c3da5a785",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID3",
+        "func": "global.set(\"ID3\",-1)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2130,
+        "y": 320,
+        "wires": [
+            [
+                "e181c33f17329a49"
+            ]
+        ]
+    },
+    {
+        "id": "17a21cc12012298d",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 1950,
+        "y": 320,
+        "wires": [
+            [
+                "1334ad0c3da5a785"
+            ]
+        ]
+    },
+    {
+        "id": "e181c33f17329a49",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2310,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "59f97e0c739e0542",
+        "type": "function",
+        "z": "2ad3025351b081ca",
+        "name": "Consulta ID4",
+        "func": "global.set(\"ID4\",-1)\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2130,
+        "y": 380,
+        "wires": [
+            [
+                "dd2177ea5baa2cd6"
+            ]
+        ]
+    },
+    {
+        "id": "eea80b0dfdda17f2",
+        "type": "inject",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payloadType": "json",
+        "x": 1950,
+        "y": 380,
+        "wires": [
+            [
+                "59f97e0c739e0542"
+            ]
+        ]
+    },
+    {
+        "id": "dd2177ea5baa2cd6",
+        "type": "debug",
+        "z": "2ad3025351b081ca",
+        "name": "ID4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2310,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "61155bc7f0835fee",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload.longitud",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2390,
+        "y": 800,
+        "wires": [
+            [
+                "ee98e00107d9d8c7"
+            ]
+        ]
+    },
+    {
+        "id": "9570b86a97f966b9",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload.longitud",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2390,
+        "y": 860,
+        "wires": [
+            [
+                "ee98e00107d9d8c7"
+            ]
+        ]
+    },
+    {
+        "id": "7847b9dea8475376",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload.longitud",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2390,
+        "y": 960,
+        "wires": [
+            [
+                "ee98e00107d9d8c7"
+            ]
+        ]
+    },
+    {
+        "id": "de860e8755e2303e",
+        "type": "switch",
+        "z": "2ad3025351b081ca",
+        "name": "",
+        "property": "payload.longitud",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2390,
+        "y": 1020,
+        "wires": [
+            [
+                "ee98e00107d9d8c7"
+            ]
+        ]
+    },
+    {
+        "id": "759329fc13f505d4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.ac.uma.es",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b6b32993bb31411d",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "594cecd70ae88430",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "acf1deecb57fc041",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "cb0a8f66055dc5e4",
+        "order": 5,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "25752c938ea6479f",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "3ea480f31c69cc51",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f257929c5b963ec0",
+        "type": "ui_group",
+        "name": "Datos Sensores",
+        "tab": "56d00aae9c36eba0",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b2cc055e98302147",
+        "type": "telegram bot",
+        "botname": "ProyectoGrupo12_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "03b5bf71738e3f11",
+        "type": "ui_group",
+        "name": "Configuración del LED",
+        "tab": "412c9c98686b2218",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "594cecd70ae88430",
+        "type": "ui_tab",
+        "name": "HUERTO 1",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "cb0a8f66055dc5e4",
+        "type": "ui_tab",
+        "name": "HUERTO 2",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "3ea480f31c69cc51",
+        "type": "ui_tab",
+        "name": "HUERTO 3",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "56d00aae9c36eba0",
+        "type": "ui_tab",
+        "name": "HUERTO 4",
+        "icon": "dashboard",
+        "order": 4,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "412c9c98686b2218",
+        "type": "ui_tab",
+        "name": "Configuración del Dispositivo",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    }
+]
