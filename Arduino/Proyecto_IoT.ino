@@ -433,6 +433,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       // Deserialize the JSON document
       DeserializationError error = deserializeJson(root, mensaje,length);
 
+      //Variables para operar:
+      int LED_logica_anterior=LED_logica;
+      int SWITCH_logica_anterior=SWITCH_logica;
+      
       // Compruebo si no hubo error
       if (error) {
       Serial.print("Error deserializeJson() failed: ");   // Si devuelve un OK no ha habido error
@@ -450,7 +454,22 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         HUM_MAX = root["HUM_MAX"];           // Humedad máxima
         T_RIEGO_OFF= root["T_RIEGO_OFF"];   // Tiempo de riego inactivo
         T_RIEGO_ON = root["T_RIEGO_ON"];    // Tiempo de riego activo
-        
+
+        //Compruebo si hubo cambio en la polaridad de los leds:
+        if(LED_logica!=LED_logica_anterior)
+        {
+          Serial.println("DENTRO LED");
+          PWM_status=abs(255-PWM_status);
+          pub_msg_led(PWM_status,"mqtt",int(ID_PLACA));   
+          PWM_anterior = PWM_status; // Guarda nuevo valor en la variable para hacer control
+        }
+        if(SWITCH_logica!=SWITCH_logica_anterior)
+        {
+          Serial.println("DENTRO SWITCH");
+          Switch_status=abs(1-Switch_status);
+          pub_msg_switch(Switch_status,"mqtt",int(ID_PLACA));
+          Switch_anterior = Switch_status;   // Guarda nuevo valor en la variable global
+        }
       }
       else    // Si el mensaje no incluye ninguno de los campos esperados
       {
