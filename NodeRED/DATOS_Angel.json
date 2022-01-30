@@ -340,7 +340,7 @@
         "wires": [
             [
                 "7caefebbb2321598",
-                "8884aae8c34d98e5"
+                "920caaf174cab8e8"
             ]
         ]
     },
@@ -534,7 +534,7 @@
         "type": "switch",
         "z": "3fbedf38893c4579",
         "name": "",
-        "property": "payload.online",
+        "property": "payload",
         "propertyType": "msg",
         "rules": [
             {
@@ -559,8 +559,8 @@
                 "bcf17d8936adec26"
             ],
             [
-                "d7ef0e799fb55776",
-                "1393306da8183a92"
+                "1393306da8183a92",
+                "4aa1f97f3f4244d3"
             ]
         ]
     },
@@ -569,7 +569,7 @@
         "type": "function",
         "z": "3fbedf38893c4579",
         "name": "SetUp ID",
-        "func": "var CHIPID = msg.payload.CHIPID;\nmsg.payload={};\nmsg.payload=true;\nif (global.get(\"ID1\")==-1)\n{\n    global.set(\"ID1\",CHIPID)\n}\nelse if (global.get(\"ID2\")==-1 & CHIPID!=global.get(\"ID1\"))\n{\n    global.set(\"ID2\",CHIPID)\n}\nelse if (global.get(\"ID3\")==-1 & CHIPID!=global.get(\"ID2\"))\n{\n    global.set(\"ID3\",CHIPID)\n}\nelse if (global.get(\"ID4\")==-1 & CHIPID!=global.get(\"ID3\"))\n{\n    global.set(\"ID4\",CHIPID)\n}\nreturn msg;",
+        "func": "var CHIPID = msg.identificador;\n//msg.payload={};\n//msg.payload=true;\nif(CHIPID==global.get(\"ID1\") || CHIPID==global.get(\"ID2\") || CHIPID==global.get(\"ID3\") || CHIPID==global.get(\"ID4\"))\n{}\nelse if (global.get(\"ID1\")==-1)\n{\n    global.set(\"ID1\",CHIPID)\n}\nelse if (global.get(\"ID2\")==-1)\n{\n    global.set(\"ID2\",CHIPID)\n}\nelse if (global.get(\"ID3\")==-1)\n{\n    global.set(\"ID3\",CHIPID)\n}\nelse if (global.get(\"ID4\")==-1)\n{\n    global.set(\"ID4\",CHIPID)\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -603,14 +603,14 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":\"true\"}",
+        "payload": "{\"CHIPID\":\"ESP3096728\",\"online\":true}",
         "payloadType": "json",
-        "x": 490,
-        "y": 120,
+        "x": 470,
+        "y": 100,
         "wires": [
             [
-                "8884aae8c34d98e5",
-                "7caefebbb2321598"
+                "7caefebbb2321598",
+                "920caaf174cab8e8"
             ]
         ]
     },
@@ -619,19 +619,16 @@
         "type": "function",
         "z": "3fbedf38893c4579",
         "name": "Borra ID",
-        "func": "var CHIPID = msg.payload.CHIPID;\n\nif (global.get(\"ID1\")==CHIPID)\n{\n    global.set(\"ID1\",-1)\n}\nif (global.get(\"ID2\")==CHIPID)\n{\n    global.set(\"ID2\",-1)\n}\nif (global.get(\"ID3\")==CHIPID)\n{\n    global.set(\"ID3\",-1)\n}\nif (global.get(\"ID4\")==CHIPID)\n{\n    global.set(\"ID4\",-1)\n}\nmsg.payload={};\nmsg.payload=true;\nreturn msg;",
+        "func": "var CHIPID = msg.identificador;\n\nif (global.get(\"ID1\")==CHIPID)\n{\n    global.set(\"ID1\",-1)\n}\nif (global.get(\"ID2\")==CHIPID)\n{\n    global.set(\"ID2\",-1)\n}\nif (global.get(\"ID3\")==CHIPID)\n{\n    global.set(\"ID3\",-1)\n}\nif (global.get(\"ID4\")==CHIPID)\n{\n    global.set(\"ID4\",-1)\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1120,
-        "y": 280,
+        "x": 1420,
+        "y": 400,
         "wires": [
-            [
-                "0e6284ff38f09330",
-                "4aa1f97f3f4244d3"
-            ]
+            []
         ]
     },
     {
@@ -1893,8 +1890,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
         "x": 1040,
@@ -2475,8 +2472,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1280,
-        "y": 500,
+        "x": 1260,
+        "y": 440,
         "wires": []
     },
     {
@@ -2511,7 +2508,7 @@
             }
         ],
         "active": true,
-        "x": 280,
+        "x": 310,
         "y": 340,
         "wires": []
     },
@@ -2571,7 +2568,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "78a1f92e52802893",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2588,7 +2585,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "aefc71834b3dcb7f",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2605,7 +2602,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "f2c5587fab9f701a",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2622,7 +2619,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "2d29f08d114f200d",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2640,7 +2637,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "aefc71834b3dcb7f",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2667,7 +2664,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "78a1f92e52802893",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2694,7 +2691,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "2d29f08d114f200d",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2721,7 +2718,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "f2c5587fab9f701a",
-        "order": 1,
+        "order": 2,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2748,7 +2745,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "aefc71834b3dcb7f",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2775,7 +2772,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "78a1f92e52802893",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2802,7 +2799,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "2d29f08d114f200d",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2829,7 +2826,7 @@
         "z": "3fbedf38893c4579",
         "name": "",
         "group": "f2c5587fab9f701a",
-        "order": 1,
+        "order": 3,
         "width": 0,
         "height": 0,
         "gtype": "gage",
@@ -2855,7 +2852,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "78a1f92e52802893",
-        "order": 1,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2872,7 +2869,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "aefc71834b3dcb7f",
-        "order": 1,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2889,7 +2886,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "f2c5587fab9f701a",
-        "order": 1,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2906,7 +2903,7 @@
         "type": "ui_text",
         "z": "3fbedf38893c4579",
         "group": "2d29f08d114f200d",
-        "order": 1,
+        "order": 4,
         "width": 0,
         "height": 0,
         "name": "",
@@ -2923,28 +2920,28 @@
         "type": "switch",
         "z": "3fbedf38893c4579",
         "name": "",
-        "property": "msg.payload.CHIPID",
+        "property": "identificador",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "eq",
                 "v": "ID1",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID2",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID3",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID4",
-                "vt": "msg"
+                "vt": "global"
             }
         ],
         "checkall": "true",
@@ -2955,19 +2952,27 @@
         "wires": [
             [
                 "2004133098b01257",
-                "66fdbe09f3acf0c1"
+                "66fdbe09f3acf0c1",
+                "bc97c99e8306e738",
+                "6c02d28bfefa522f"
             ],
             [
                 "2a69ed92bd4ea703",
-                "8eb5aacc143cdcd2"
+                "8eb5aacc143cdcd2",
+                "bc97c99e8306e738",
+                "39dcdca6c65afa0e"
             ],
             [
                 "050b806996b0b5be",
-                "d615cb396224cef8"
+                "d615cb396224cef8",
+                "bc97c99e8306e738",
+                "507b8870d1ee0ee8"
             ],
             [
                 "0bcae2022f72df32",
-                "ce1b257dc7c29d9b"
+                "ce1b257dc7c29d9b",
+                "bc97c99e8306e738",
+                "ea96972ffa02663c"
             ]
         ]
     },
@@ -2999,7 +3004,7 @@
         "showGlow": true,
         "name": "",
         "x": 1830,
-        "y": 180,
+        "y": 120,
         "wires": []
     },
     {
@@ -3016,7 +3021,7 @@
         "layout": "row-spread",
         "className": "",
         "x": 1880,
-        "y": 140,
+        "y": 40,
         "wires": []
     },
     {
@@ -3047,7 +3052,7 @@
         "showGlow": true,
         "name": "",
         "x": 1830,
-        "y": 260,
+        "y": 240,
         "wires": []
     },
     {
@@ -3064,7 +3069,7 @@
         "layout": "row-spread",
         "className": "",
         "x": 1880,
-        "y": 220,
+        "y": 160,
         "wires": []
     },
     {
@@ -3095,7 +3100,7 @@
         "showGlow": true,
         "name": "",
         "x": 1830,
-        "y": 340,
+        "y": 360,
         "wires": []
     },
     {
@@ -3112,7 +3117,7 @@
         "layout": "row-spread",
         "className": "",
         "x": 1880,
-        "y": 300,
+        "y": 280,
         "wires": []
     },
     {
@@ -3143,7 +3148,7 @@
         "showGlow": true,
         "name": "",
         "x": 1830,
-        "y": 420,
+        "y": 480,
         "wires": []
     },
     {
@@ -3160,7 +3165,7 @@
         "layout": "row-spread",
         "className": "",
         "x": 1880,
-        "y": 380,
+        "y": 400,
         "wires": []
     },
     {
@@ -3168,53 +3173,279 @@
         "type": "switch",
         "z": "3fbedf38893c4579",
         "name": "",
-        "property": "msg.payload.CHIPID",
+        "property": "identificador",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "eq",
                 "v": "ID1",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID2",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID3",
-                "vt": "msg"
+                "vt": "global"
             },
             {
                 "t": "eq",
                 "v": "ID4",
-                "vt": "msg"
+                "vt": "global"
             }
         ],
         "checkall": "true",
         "repair": false,
         "outputs": 4,
-        "x": 1390,
-        "y": 340,
+        "x": 1210,
+        "y": 280,
         "wires": [
             [
                 "2004133098b01257",
-                "66fdbe09f3acf0c1"
+                "66fdbe09f3acf0c1",
+                "d7ef0e799fb55776",
+                "0e6284ff38f09330",
+                "6c02d28bfefa522f"
             ],
             [
                 "2a69ed92bd4ea703",
-                "8eb5aacc143cdcd2"
+                "8eb5aacc143cdcd2",
+                "d7ef0e799fb55776",
+                "0e6284ff38f09330",
+                "39dcdca6c65afa0e"
             ],
             [
                 "050b806996b0b5be",
-                "d615cb396224cef8"
+                "d615cb396224cef8",
+                "d7ef0e799fb55776",
+                "0e6284ff38f09330",
+                "507b8870d1ee0ee8"
             ],
             [
                 "0bcae2022f72df32",
-                "ce1b257dc7c29d9b"
+                "ce1b257dc7c29d9b",
+                "d7ef0e799fb55776",
+                "0e6284ff38f09330",
+                "ea96972ffa02663c"
             ]
         ]
+    },
+    {
+        "id": "920caaf174cab8e8",
+        "type": "change",
+        "z": "3fbedf38893c4579",
+        "name": "ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "identificador",
+                "pt": "msg",
+                "to": "payload.CHIPID",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.online",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 750,
+        "y": 260,
+        "wires": [
+            [
+                "8884aae8c34d98e5"
+            ]
+        ]
+    },
+    {
+        "id": "bc97c99e8306e738",
+        "type": "debug",
+        "z": "3fbedf38893c4579",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1590,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "c762e9b99f1827f3",
+        "type": "inject",
+        "z": "3fbedf38893c4579",
+        "name": "FALSE",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "jsonata",
+        "x": 1590,
+        "y": 500,
+        "wires": [
+            [
+                "2004133098b01257",
+                "66fdbe09f3acf0c1",
+                "2a69ed92bd4ea703",
+                "8eb5aacc143cdcd2",
+                "050b806996b0b5be",
+                "d615cb396224cef8",
+                "0bcae2022f72df32",
+                "ce1b257dc7c29d9b",
+                "ea96972ffa02663c",
+                "507b8870d1ee0ee8",
+                "39dcdca6c65afa0e",
+                "6c02d28bfefa522f"
+            ]
+        ]
+    },
+    {
+        "id": "6c02d28bfefa522f",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 1,
+        "group": "78a1f92e52802893",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "39dcdca6c65afa0e",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 1,
+        "group": "aefc71834b3dcb7f",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "507b8870d1ee0ee8",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 1,
+        "group": "f2c5587fab9f701a",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "ea96972ffa02663c",
+        "type": "ui_led",
+        "z": "3fbedf38893c4579",
+        "order": 1,
+        "group": "2d29f08d114f200d",
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#008000",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "",
+        "x": 1830,
+        "y": 440,
+        "wires": []
     },
     {
         "id": "759329fc13f505d4",
@@ -3389,7 +3620,7 @@
         "type": "ui_tab",
         "name": "HUERTO 1",
         "icon": "dashboard",
-        "order": 3,
+        "order": 4,
         "disabled": false,
         "hidden": false
     },
@@ -3398,7 +3629,7 @@
         "type": "ui_tab",
         "name": "HUERTO 2",
         "icon": "dashboard",
-        "order": 4,
+        "order": 5,
         "disabled": false,
         "hidden": false
     },
@@ -3407,7 +3638,7 @@
         "type": "ui_tab",
         "name": "HUERTO 3",
         "icon": "dashboard",
-        "order": 5,
+        "order": 6,
         "disabled": false,
         "hidden": false
     },
@@ -3416,7 +3647,7 @@
         "type": "ui_tab",
         "name": "HUERTO 4",
         "icon": "dashboard",
-        "order": 6,
+        "order": 7,
         "disabled": false,
         "hidden": false
     },
