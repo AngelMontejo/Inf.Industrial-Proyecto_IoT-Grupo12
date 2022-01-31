@@ -1,3 +1,4 @@
+// Incluimos las librerías
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include "DHTesp.h"
@@ -15,7 +16,7 @@ void progreso_OTA(int,int);
 void final_OTA();
 void inicio_OTA();
 void error_OTA(int);
-unsigned long lastAct=0;  // Esta variable sirve para llevar el tiempo de cuando se actualizó el último OTA
+unsigned long lastAct=0;  // Esta variable sirve para llevar el tiempo de cuando se actualizó el último código
 
 
 //Datos sensor y estructura de datos
@@ -74,27 +75,27 @@ int T_RIEGO_OFF=3;   // Tiempo que se mantiene el riego apagado en minutos
 Button2 button;          // Objeto de la cabecera button2.h
 char tipo_pulsacion[12]; // Variable indica tipo de pulsacion
 
-// Datos para conectar a WIFI
-const char* ssid = "MIWIFI_E32g";           // Usuario del punto de acceso.
-const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
-const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
-const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
-const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
+// Datos para conectar al WIFI
+const char* ssid = "MOVISTAR_6D6C";             // Usuario del punto de acceso.
+const char* password = "7D4FAB6B627384F85CDD";  // Contraseña del punto de acceso.
+const char* mqtt_server = "iot.ac.uma.es";      // Broker MQTT de la asignatura
+const char* mqtt_user = "II12";                 // Usuario de nuestro grupo para acceder al broker
+const char* mqtt_pass = "jXXm2E13";             // Contraseña para acceder al broker
 
 // Definimos los mensajes que se van a publicar:
-#define MSG_BUFFER_SIZE  (250)  // "#define" permite asignarle un nombre a una constante.
-char msg_datos[MSG_BUFFER_SIZE];      // Mensaje de datos
-char msg_on[MSG_BUFFER_SIZE];   // Mensaje de conexion activa
-char msg_off[MSG_BUFFER_SIZE];  // Mensaje de conexion inactiva
-char msg_led[MSG_BUFFER_SIZE];  // Mensaje con estado del LED1 y LED2
-unsigned long lastMsg = 0;      // Tiempo en el que se envió el último mensaje de datos
+#define MSG_BUFFER_SIZE  (250)   // "#define" permite asignarle un nombre a una constante, 250 es el tamaño
+char msg_datos[MSG_BUFFER_SIZE]; // Mensaje de datos
+char msg_on[MSG_BUFFER_SIZE];    // Mensaje de conexion activa
+char msg_off[MSG_BUFFER_SIZE];   // Mensaje de conexion inactiva
+char msg_led[MSG_BUFFER_SIZE];   // Mensaje con estado del LED1 y LED2
+unsigned long lastMsg = 0;       // Tiempo en el que se envió el último mensaje de datos
 
 
 // Creamos un cliente MQTT denominado "espClient".
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// Definimos los topics:
+// Definimos los topics, la función de cada uno se encuentra en el manual de usuario:
   char topic_conexion[50];
   char topic_datos[50];
   char topic_config[50];
