@@ -7,10 +7,12 @@
 
 //--------------DEFINICION VARIABLES--------------------------
 //Datos para actualización OTA:
-#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
-#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
-#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
+#define OTA_URL "https://iot.ac.uma.es:1880/esp8266-ota/update" // Address of OTA update server                                                            
 #define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
+//#define HTTP_OTA_ADDRESS      F("172.16.53.138")    // Address of OTA update server
+//#define HTTP_OTA_PATH         F("/esp8266-ota/update")                // Path to update firmware
+//#define HTTP_OTA_PORT         1880                                    // Port of update server                                                          
+//#define HTTP_OTA_VERSION      String(__FILE__).substring(String(__FILE__).lastIndexOf('\\')+1) + ".nodemcu"  // Name of firmware
 
 //Funciones para progreso de OTA
 void progreso_OTA(int,int);
@@ -65,7 +67,9 @@ int vel_PWM=0;
 int LED_logica=0;
 int SWITCH_logica=0;
 float T_MAX=50;
+float T_MIN=15;
 float HUM_MAX=50;
+float HUM_MIN= 15;
 int T_RIEGO_ON=20;  //Minutos
 int T_RIEGO_OFF=3;  //Minutos
 
@@ -76,8 +80,8 @@ Button2 button;         // Objeto de la cabecera button2.h
 char tipo_pulsacion[12];   // Variable indica tipo de pulsacion
 
 // Datos para conectar a WIFI
-const char* ssid = "MIWIFI_E32g";           // Usuario del punto de acceso.
-const char* password = "cpDp7spW";          // Contraseña del punto de acceso.
+const char* ssid = "MIWIFI_2G_YcHs";           // Usuario del punto de acceso.
+const char* password = "bHEYgPcL";          // Contraseña del punto de acceso.
 const char* mqtt_server = "iot.ac.uma.es";  // Broker MQTT de la asignatura
 const char* mqtt_user = "II12";             // Usuario de nuestro grupo para acceder al broker
 const char* mqtt_pass = "jXXm2E13";         // Contraseña para acceder al broker
@@ -113,15 +117,18 @@ void intenta_OTA()
 { 
   Serial.println( "--------------------------" );  
   Serial.println( "Comprobando actualización:" );
-  Serial.print(HTTP_OTA_ADDRESS);Serial.print(":");Serial.print(HTTP_OTA_PORT);Serial.println(HTTP_OTA_PATH);
+  Serial.print(OTA_URL);
   Serial.println( "--------------------------" );  
   ESPhttpUpdate.setLedPin(LED_OTA, LOW);
   ESPhttpUpdate.onStart(inicio_OTA);
   ESPhttpUpdate.onError(error_OTA);
   ESPhttpUpdate.onProgress(progreso_OTA);
   ESPhttpUpdate.onEnd(final_OTA);
-  WiFiClient wClient;
-  switch(ESPhttpUpdate.update(wClient, HTTP_OTA_ADDRESS, HTTP_OTA_PORT, HTTP_OTA_PATH, HTTP_OTA_VERSION)) {
+  WiFiClientSecure wClient;
+  // Reading data over SSL may be slow, use an adequate timeout
+  wClient.setTimeout(12); // timeout argument is defined in seconds for setTimeout
+  wClient.setInsecure();
+  switch(ESPhttpUpdate.update(wClient, OTA_URL, HTTP_OTA_VERSION)) {
     case HTTP_UPDATE_FAILED:
       Serial.printf(" HTTP update failed: Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
       break;
@@ -133,6 +140,30 @@ void intenta_OTA()
       break;
     }
 }
+//void intenta_OTA()
+//{ 
+//  Serial.println( "--------------------------" );  
+//  Serial.println( "Comprobando actualización:" );
+//  Serial.print(HTTP_OTA_ADDRESS);Serial.print(":");Serial.print(HTTP_OTA_PORT);Serial.println(HTTP_OTA_PATH);
+//  Serial.println( "--------------------------" );  
+//  ESPhttpUpdate.setLedPin(LED_OTA, LOW);
+//  ESPhttpUpdate.onStart(inicio_OTA);
+//  ESPhttpUpdate.onError(error_OTA);
+//  ESPhttpUpdate.onProgress(progreso_OTA);
+//  ESPhttpUpdate.onEnd(final_OTA);
+//  WiFiClient wClient;
+//  switch(ESPhttpUpdate.update(wClient, HTTP_OTA_ADDRESS, HTTP_OTA_PORT, HTTP_OTA_PATH, HTTP_OTA_VERSION)) {
+//    case HTTP_UPDATE_FAILED:
+//      Serial.printf(" HTTP update failed: Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+//      break;
+//    case HTTP_UPDATE_NO_UPDATES:
+//      Serial.println(F(" El dispositivo ya está actualizado"));
+//      break;
+//    case HTTP_UPDATE_OK:
+//      Serial.println(F(" OK"));
+//      break;
+//    }
+//}
 
 //----------------FUNCIONES FOTA-------------------------------------
 void final_OTA()
@@ -273,12 +304,15 @@ void longClick(Button2& btn) {
 void doubleClick(Button2& btn) {
     Serial.println("double click\n");
     sprintf(tipo_pulsacion, "doubleclick");
+    Riego_status=abs(1-Riego_status);
+    lastRiego= millis();
+    pub_msg_riego(Riego_status, "pulsador", -1);
     //LED1 a nivel máximo:
-    PWM_boton = PWM_status;
-    PWM_status=0;
-    PWM_anterior=PWM_status;
-    analogWrite(LED1,PWM_status); // Actualizamos su valor
-    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
+//    PWM_boton = PWM_status;
+//    PWM_status=0;
+//    PWM_anterior=PWM_status;
+//    analogWrite(LED1,PWM_status); // Actualizamos su valor
+//    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
 }
 //--------------------MENSAJE PWM----------------------------
 void pub_msg_led(float PWM, char* origen, int id) {    //Funcion genera y publica mensaje de actualizacion del LED1 (solo para el pulsador)
@@ -304,7 +338,6 @@ void pub_msg_riego(float Riego, char* origen, int id) {    //Funcion genera y pu
     // Genera mensaje para publicar
     StaticJsonDocument<96> doc;
     doc["CHIPID"] = ID_PLACA;
-    doc["Polaridad"]=LED_logica;
     doc["RIEGO"] = Riego;
     doc["origen"] = origen;
     if(origen=="mqtt")
@@ -373,45 +406,70 @@ void pub_msg_datos(struct registro_datos misdatos)
 }
 
 //-------------------ACCIÓN DE CONTROL------------------------
-void control_PWM(struct registro_datos misdatos)
+void control_Temp(struct registro_datos misdatos)
 {
   if(misdatos.temp>T_MAX & PWM_status!=255) //Si la temperatura supera el límite apagamos los focos
   { 
       PWM_status=255;
-      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualiz
+      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualizacion
   }
-  else if(misdatos.temp<T_MAX)
+  else if(misdatos.temp>T_MIN & misdatos.temp<T_MAX)
   {
-      if(PWM_status!=PWM_anterior){
-        pub_msg_led(PWM_anterior,"control",-1);
+      if(PWM_status!=PWM_anterior){             // Si no se ha mandado un mensaje ya
+        pub_msg_led(PWM_anterior,"control",-1); // Llamamos a la funcion manda mensaje de actualizacion
       }
       PWM_status=PWM_anterior;      
   }
+  else if(misdatos.temp<T_MIN & PWM_status!=0)  //Si la temperatura cae por debajo del minimo se enciende el foco
+  {
+      PWM_status=0;
+      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualizacion
+  }
 }
 
-void control_SWITCH(struct registro_datos misdatos)
+void control_Hum(struct registro_datos misdatos)
 {
-  if(misdatos.hum>HUM_MAX & Switch_status!=LOW)
+  if(misdatos.hum>HUM_MAX & Switch_status!=LOW)   //Si la humedad sube del máximo enciende el ventilador
   {
     Switch_status=LOW;
     pub_msg_switch(Switch_status,"control",-1);
   }
-  else
+//  else if(misdatos.hum>HUM_MIN & misdatos.hum<HUM_MAX)
+//  {
+//    if(Switch_status!=Switch_anterior){              // Si no se ha mandado un mensaje ya
+//       Switch_status=Switch_anterior;
+//    }
+//    Switch_anterior=Switch_status;
+//    Serial.println("HUMEDAD MEDIA");
+//    Serial.println(Switch_status);
+//  }
+  else if(misdatos.hum<HUM_MIN) 
   {
-    Switch_status=Switch_anterior;
+    if(Switch_status!=HIGH){    //Si la humedad baja del minimo apaga el ventilador
+    Switch_status=HIGH;
+    pub_msg_switch(Switch_status,"control",-1);
+    }
+    if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*30*1000 & Riego_status==HIGH)  //Si riego inactivo se activa y ha pasado la mitad del periodo de T_RIEGO_OFF
+    {
+    Riego_status=LOW;
+    lastRiego= millis();
+    pub_msg_riego(Riego_status, "control", -1);
+    }
   }
 }
 
 void control_RIEGO(struct registro_datos misdatos)
 {
-  if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*60*1000 & Riego_status==HIGH)
+  if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*60*1000 & Riego_status==HIGH)  //Si pasa el tiempo OFF activa el riego
   {
-    Riego_status=LOW;
+    Riego_status=LOW; 
     lastRiego= millis();
+    pub_msg_riego(Riego_status, "control", -1);
   }
-  else if((misdatos.tiempo-lastRiego)>T_RIEGO_ON*60*1000 & Riego_status==LOW)
+  else if((misdatos.tiempo-lastRiego)>T_RIEGO_ON*60*1000 & Riego_status==LOW) //Si pasa el tiempo ON apaga el riego
   {
     Riego_status=HIGH;
+    pub_msg_riego(Riego_status, "control", -1);
   }
 
   
@@ -450,8 +508,10 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
         vel_PWM = root["velocidad"];        // Velocidad de incremento PWM
         LED_logica = root["LED"];           // Logica del LED1
         SWITCH_logica = root["SWITCH"];     // Logica del LED2
-        T_MAX = root["T_MAX"];               // Temperatura maxima
-        HUM_MAX = root["HUM_MAX"];           // Humedad máxima
+        T_MAX = root["T_MAX"];              // Temperatura maxima
+        T_MIN = root["T_MIN"];              // Temperatura minima
+        HUM_MAX = root["HUM_MAX"];          // Humedad máxima
+        HUM_MIN = root["HUM_MIN"];          // Humedad mínima
         T_RIEGO_OFF= root["T_RIEGO_OFF"];   // Tiempo de riego inactivo
         T_RIEGO_ON = root["T_RIEGO_ON"];    // Tiempo de riego activo
 
@@ -744,10 +804,10 @@ void loop() {
 //CONTROL PARAMETROS--------------
   //Control led PWM en funcion de la temperatura:
   misdatos.temp = dht.getTemperature();    // Datos de temperatura.
-  control_PWM(misdatos);
+  control_Temp(misdatos);
   //Control SITCH en funcion de la humedad:
   misdatos.hum = dht.getHumidity();        // Datos de humedad.
-  control_SWITCH(misdatos);
+  control_Hum(misdatos);
   //Control de Riego en función del tiempo:
   control_RIEGO(misdatos);
   
@@ -784,8 +844,11 @@ void loop() {
       else{
          PWM_actual=((PWM_actual*100/255)+1)*255/100;
       }
-      analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de PWM.
+      analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de FOCO
   }
 
-  digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de SWITCH  
+  digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de VENTILADOR  
+  
+  //digitalWrite(LED3,Riego_status);    // Escribimos en el LED3 el valor de RIEGO
+  //DESCOMENTAR LA LINEA SUPERIOR PARA HABILITAR EL RIEGO 
 }
