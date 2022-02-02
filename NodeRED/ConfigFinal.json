@@ -583,7 +583,7 @@
         "rules": [
             {
                 "t": "set",
-                "p": "polaridad_PWM3",
+                "p": "polaridad_PWM4",
                 "pt": "global",
                 "to": "payload",
                 "tot": "msg"
