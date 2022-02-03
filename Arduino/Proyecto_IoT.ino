@@ -183,7 +183,7 @@ void setup_wifi() { // En esta función intentamos conectarnos a la red WIFI def
       //Actualiza actuadores:
       analogWrite(LED1,PWM_status);
       digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de VENTILADOR  
-      digitalWrite(LED3,Riego_status);    // Escribimos en el LED3 el valor de RIEGO
+      digitalWrite(LED3,Riego_status);     // Escribimos en el LED3 el valor de RIEGO
   }
   // Una vez que se conecta lo indica por el puerto serie
   Serial.println("");
@@ -261,38 +261,38 @@ void released(Button2& btn) {     // Se llama cuando se libera el boton
     Serial.print("released: ");
     Serial.println(btn.wasPressedFor());
 }
-void click(Button2& btn) {  //Simple click: Apaga LED PWM/ Enciende a último valor
+void click(Button2& btn) {  //Simple click: Apaga LED PWM/Enciende a último valor
     Serial.println("click\n");
     sprintf(tipo_pulsacion, "simpleclick");
     //Apagamos/Encendemos el LED1:
-    if (PWM_status<255){
-      PWM_boton = PWM_status;
-      PWM_status=255;  // Se apaga el LED1
-      analogWrite(LED1,PWM_status); // Escribe el valor calculado
+    if (PWM_status<255){      // Si el foco no está apagado
+      PWM_boton = PWM_status; // Guarda el último valor del foco
+      PWM_status=255;         // Se apaga el foco
     }
-    else{
-      PWM_status=PWM_boton;
-      analogWrite(LED1,PWM_boton); //Ponemos la intensidad del LED al ultimo valor registrado
+    else{                     // Si el foco está apagado
+      PWM_status=PWM_boton;   // Se escribe el último valor guardado
     }
-    pub_msg_led(PWM_status,"pulsador",-1);          //Llamamos funcion manda mensaje de actualizacion del LED1 
+    pub_msg_led(PWM_status,"pulsador",-1);   //Llamamos funcion manda mensaje de actualizacion del LED1 
     PWM_anterior=PWM_status;   
 }
-void longClickDetected(Button2& btn) {
+void longClickDetected(Button2& btn) {  // Se llama cuando se detecta un pulso largo
     Serial.println("long click detected\n");
 }
-void longClick(Button2& btn) {
+void longClick(Button2& btn) {  //Si clic largo: Comprueba actualización
     Serial.println("long click\n");
     sprintf(tipo_pulsacion, "longclick");
     //Actualizacion FOTA
-    lastAct=millis();
-    intenta_OTA();    //Llamamos a la función que comprueba si hay actualizaciones OTA
+    lastAct=millis(); // Tiempo de última actualización
+    intenta_OTA();    // Llamamos a la función que comprueba si hay actualizaciones OTA
 }
-void doubleClick(Button2& btn) {
+void doubleClick(Button2& btn) {  //Si doble clic: apaga/enciende el riego
     Serial.println("double click\n");
     sprintf(tipo_pulsacion, "doubleclick");
-    Riego_status=abs(1-Riego_status);
-    lastRiego= millis();
-    pub_msg_riego(Riego_status, "pulsador", -1);
+    Riego_status=abs(1-Riego_status); // Alterna el valor del riego (0,1)
+    if(Riego_status==LOW){
+    lastRiego= millis();              // Si se ha acivado el riego guarda el tiempo de comienzo
+    }
+    pub_msg_riego(Riego_status, "pulsador", -1);  //Publica estado del riego
 }
 //-------------------PUBLICAR MENSAJES---------------------------------
 //--------------------MENSAJE PWM----------------------------
@@ -387,77 +387,74 @@ void pub_msg_datos(struct registro_datos misdatos)
 }
 
 //-------------------ACCIÓN DE CONTROL------------------------
-void control(struct registro_datos &misdatos)
+void control(struct registro_datos &misdatos)   //Función de control general
 {
-   //Control led PWM en funcion de la temperatura:
-      misdatos.temp = dht.getTemperature();    // Datos de temperatura.
-      control_Temp(misdatos);
-      //Control SITCH y el riego en funcion de la humedad:
-      misdatos.tiempo=millis();
-      misdatos.hum = dht.getHumidity();        // Datos de humedad.
-      control_Hum(misdatos);
-      //Control de Riego en función del tiempo:
-      
-      control_RIEGO(misdatos);
+  // Adquisición de datos:
+  misdatos.temp = dht.getTemperature();    // Datos de temperatura
+  misdatos.tiempo=millis();
+  misdatos.hum = dht.getHumidity();        // Datos de humedad.
+   .
+  // Funciones de control:
+  control_Temp(misdatos);
+  control_Hum(misdatos);
+  control_RIEGO(misdatos);
 }
-void control_Temp(struct registro_datos misdatos)
+void control_Temp(struct registro_datos misdatos) // Control led PWM en funcion de la temperatura:
 {
-  if(misdatos.temp>T_MAX & PWM_status!=255) //Si la temperatura supera el límite apagamos los focos
+  if(misdatos.temp>T_MAX & PWM_status!=255)       // Si la temperatura supera el límite apagamos los focos
   { 
-      PWM_status=255;
-      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualizacion
+      PWM_status=255;                             // Apaga el foco
+      pub_msg_led(PWM_status,"control",-1);       // Llamamos funcion manda mensaje de actualizacion
   }
   else if(misdatos.temp>T_MIN & misdatos.temp<T_MAX)
   {
-      if(PWM_status!=PWM_anterior){             // Si no se ha mandado un mensaje ya
-        pub_msg_led(PWM_anterior,"control",-1); // Llamamos a la funcion manda mensaje de actualizacion
+      if(PWM_status!=PWM_anterior){               // Si no se ha mandado un mensaje ya
+        pub_msg_led(PWM_anterior,"control",-1);   // Llamamos a la funcion manda mensaje de actualizacion
       }
-      PWM_status=PWM_anterior;      
+      PWM_status=PWM_anterior;                    // Restaura el foco al último valor guardado
   }
-  else if(misdatos.temp<T_MIN & PWM_status!=0)  //Si la temperatura cae por debajo del minimo se enciende el foco
+  else if(misdatos.temp<T_MIN & PWM_status!=0)    // Si la temperatura cae por debajo del minimo se enciende el foco
   {
-      PWM_status=0;
-      pub_msg_led(PWM_status,"control",-1); // Llamamos funcion manda mensaje de actualizacion
+      PWM_status=0;                               // Enciende el foco al máximo
+      pub_msg_led(PWM_status,"control",-1);       // Llamamos funcion manda mensaje de actualizacion
   }
 }
 
 void control_Hum(struct registro_datos misdatos)
 {
-  if(misdatos.hum>HUM_MAX & Switch_status!=LOW)   //Si la humedad sube del máximo enciende el ventilador
+  if(misdatos.hum>HUM_MAX & Switch_status!=LOW)   // Si la humedad sube del máximo enciende el ventilador
   {
-    Switch_status=LOW;
-    pub_msg_switch(Switch_status,"control",-1);
+    Switch_status=LOW;                            // Enciende ventilador
+    pub_msg_switch(Switch_status,"control",-1);   // Publica estado del ventilador
   }
-  else if(misdatos.hum<HUM_MIN) 
+  else if(misdatos.hum<HUM_MIN)                   // Si la humedad cae por debajo del mínimo apaga el ventilador
   {
-    if(Switch_status!=HIGH){    //Si la humedad baja del minimo apaga el ventilador
-    Switch_status=HIGH;
-    pub_msg_switch(Switch_status,"control",-1);
+    if(Switch_status!=HIGH){                      // Si el ventilador no esta apagado
+    Switch_status=HIGH;                           // Apaga ventilador
+    pub_msg_switch(Switch_status,"control",-1);   // Publica el estado del ventilador
     }
     if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*30*1000 & Riego_status==HIGH)  //Si riego inactivo se activa y ha pasado la mitad del periodo de T_RIEGO_OFF
     {
-    Riego_status=LOW;
-    lastRiego= millis();
-    pub_msg_riego(Riego_status, "control", -1);
+    Riego_status=LOW;                             // Enciende el riego
+    lastRiego= millis();                          // Guarda última activación del riego
+    pub_msg_riego(Riego_status, "control", -1);   // Publica estado del riego
     }
   }
 }
 
-void control_RIEGO(struct registro_datos misdatos)
+void control_RIEGO(struct registro_datos misdatos)  // Control temporización del riego
 {
-  if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*60*1000 & Riego_status==HIGH)  //Si pasa el tiempo OFF activa el riego
+  if((misdatos.tiempo-lastRiego)>T_RIEGO_OFF*60*1000 & Riego_status==HIGH)  //Si pasa el tiempo OFF y el riego esta apagado
   {
-    Riego_status=LOW; 
-    lastRiego= millis();
-    pub_msg_riego(Riego_status, "control", -1);
+    Riego_status=LOW;                               // Se activa el riego
+    lastRiego= millis();                            // Guarda última activación del riego
+    pub_msg_riego(Riego_status, "control", -1);     // Publica estado del riego
   }
-  else if((misdatos.tiempo-lastRiego)>T_RIEGO_ON*60*1000 & Riego_status==LOW) //Si pasa el tiempo ON apaga el riego
+  else if((misdatos.tiempo-lastRiego)>T_RIEGO_ON*60*1000 & Riego_status==LOW) //Si pasa el tiempo ON y el riego esta encendido
   {
-    Riego_status=HIGH;
-    pub_msg_riego(Riego_status, "control", -1);
-  }
-
-  
+    Riego_status=HIGH;                              // Apaga el riego
+    pub_msg_riego(Riego_status, "control", -1);     // Publica estado del riego
+  }  
 }
 //-------------------PROCESAR MENSAJES----------------------------
 void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
@@ -629,11 +626,14 @@ void procesa_mensaje(char* topic, byte* payload, unsigned int length) {
       Serial.println(error.c_str());
     }
     else
-      if(root.containsKey("level"))    // Se comprueba si existe el campo "level"
+      if(root.containsKey("level"))      // Se comprueba si existe el campo "level"
       { 
         Riego_status = root["level"];    // Se guarda el contenido del campo "level" 
-        id = root["id"];               // Se guarda el contenido del campo "id"
+        id = root["id"];                 // Se guarda el contenido del campo "id"
 
+        if(Riego_status==LOW){
+        lastRiego= millis();             // Si se ha acivado el riego guarda el tiempo de comienzo
+        }
         // Se muestra info del mensaje
         Serial.print("Mensaje OK, valor del switch = ");
         Serial.println(Riego_status);
@@ -731,20 +731,18 @@ void setup() {
 }
 
 //-------------------------MAIN-------------------------------
-
 void loop(){
-
   // Definimos la estructura de datos del tipo registro_datos
   struct registro_datos misdatos;        
   
   // Guardamos en el campo 'tiempo' el tiempo actual en ms
   misdatos.tiempo = millis();
   
-  // Si el cliente se desconecta, llamamos a a la función de reconectar.
+  // Si el cliente mqtt se desconecta, llamamos a a la función de reconectar.
   if (!client.connected()) {
-    reconnect();
+    reconnect();     // Función de conexión al broker
   }
-  client.loop();
+  client.loop();     // Comprueba si existen mensajes nuevos en los topics a los que se esta suscrito
 
   // Si pasa el tiempo de actualización se comprueba si hay actualizacion FOTA:
    if (vel_fota==0) //Si el campo vel_fota es 0 no se actualiza periodicamente
@@ -758,18 +756,6 @@ void loop(){
   // Loop del boton:
     button.loop();             // Llamamos a la funcion del boton
 
-    
-//CONTROL PARAMETROS--------------
-control(misdatos);
-//  //Control led PWM en funcion de la temperatura:
-//  misdatos.temp = dht.getTemperature();    // Datos de temperatura.
-//  control_Temp(misdatos);
-//  //Control SITCH en funcion de la humedad:
-//  misdatos.hum = dht.getHumidity();        // Datos de humedad.
-//  control_Hum(misdatos);
-//  //Control de Riego en función del tiempo:
-//  control_RIEGO(misdatos);
-//  
 //MENSAJE DE DATOS----------------
   // Manda mensaje de datos, si se supera el tiempo vel_envio
    if (misdatos.tiempo - lastMsg > vel_envio*1000) { //vel_envio originalmente en segundos, lo pasamos a milisegundos
@@ -778,36 +764,43 @@ control(misdatos);
     // Actualizamos el valor de los sensores y de la batería. EL ID de la placa tambien
     sprintf(misdatos.chipid, ID_PLACA);      // Identificador de la placa.    
     misdatos.bateria = ESP.getVcc();         // Medimos la alimentación de la placa.
-   
+
+    // Actualizamos los datos del sensor:
+    misdatos.temp = dht.getTemperature();    // Datos de temperatura
+    misdatos.hum = dht.getHumidity();        // Datos de humedad.
+   .
     // Actualizamos datos de conexión.
     sprintf(misdatos.SSId, ssid);            // Datos del ssid.
     misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
     misdatos.ip = WiFi.localIP();            // Datos de dirección IP (convertidos a tipo string).
    
     // Actualizamos valores de los leds 
-    misdatos.valor_led = PWM_status;
-    misdatos.valor_switch = Switch_status;
-    misdatos.valor_riego = Riego_status;
+    misdatos.valor_led = PWM_status;         // Estado del foco
+    misdatos.valor_switch = Switch_status;   // Estado del ventilador
+    misdatos.valor_riego = Riego_status;     // Estado del riego
 
     //Publicamos el mensaje:
-    pub_msg_datos(misdatos);
+    pub_msg_datos(misdatos);    // Llamamos a la funcion que publica el mensaje de datos
   }
 
+    
+//CONTROL PARAMETROS--------------
+control(misdatos);  // Función de control general
+
 //ACTUADORES---------------------------
-  if(abs(PWM_actual-PWM_status)>1)
+  if(abs(PWM_actual-PWM_status)>1)  // Función de cambio progresivo del foco
   {
-      delay(vel_PWM);
-      if(PWM_actual>PWM_status){
-         PWM_actual=((PWM_actual*100/255)-1)*255/100;
+      delay(vel_PWM);                                 // Retardo del parámetro de configuración 'vel_PWM'
+      if(PWM_actual>PWM_status){                      // Si el status del foco es inferior al valor que se escribe en el pin
+         PWM_actual=((PWM_actual*100/255)-1)*255/100; //Se decrementa un 1% el valor que se escribe en el foco
       }
-      else{
-         PWM_actual=((PWM_actual*100/255)+1)*255/100;
+      else{                                           // Si el status del foco supera al valor que se escribe en el pin
+         PWM_actual=((PWM_actual*100/255)+1)*255/100; //Se incrementa un 1% el valor que se escribe en el foco
       }
       analogWrite(LED1,PWM_actual);    // Escribimos en el LED1 el valor de FOCO
   }
 
   digitalWrite(LED2,Switch_status);    // Escribimos en el LED2 el valor de VENTILADOR  
-  
-  //digitalWrite(LED3,Riego_status);    // Escribimos en el LED3 el valor de RIEGO
-  //DESCOMENTAR LA LINEA SUPERIOR PARA HABILITAR EL RIEGO 
+  digitalWrite(LED3,Riego_status);    // Escribimos en el LED3 el valor de RIEGO
+
 }
