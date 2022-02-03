@@ -393,7 +393,7 @@ void control(struct registro_datos &misdatos)   //Función de control general
   misdatos.temp = dht.getTemperature();    // Datos de temperatura
   misdatos.tiempo=millis();
   misdatos.hum = dht.getHumidity();        // Datos de humedad.
-   .
+
   // Funciones de control:
   control_Temp(misdatos);
   control_Hum(misdatos);
@@ -768,7 +768,7 @@ void loop(){
     // Actualizamos los datos del sensor:
     misdatos.temp = dht.getTemperature();    // Datos de temperatura
     misdatos.hum = dht.getHumidity();        // Datos de humedad.
-   .
+
     // Actualizamos datos de conexión.
     sprintf(misdatos.SSId, ssid);            // Datos del ssid.
     misdatos.rssi = WiFi.RSSI();             // Datos de conexión de wifi.
