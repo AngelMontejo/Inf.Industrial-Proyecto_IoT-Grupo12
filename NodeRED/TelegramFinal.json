@@ -1,0 +1,2482 @@
+[
+    {
+        "id": "ed6565516a324783",
+        "type": "tab",
+        "label": "TELEGRAM",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "43d5613c5437ba1c",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje bienvenida y cambio intensidad",
+        "func": "var valor=parseInt(msg.payload.content)\nmsg.payload.ledcambio=0\nif(valor>=0 && valor<=100)\n{\n    msg.payload.ledlevel=valor\n    if (flow.get(\"cambiarled1\")==1)\n    {\n        msg.payload.ledcambio=1\n    }\n    else if (flow.get(\"cambiarled2\")==1)\n    {\n        msg.payload.ledcambio=2\n    }\n    else if (flow.get(\"cambiarled3\")==1)\n    {\n        msg.payload.ledcambio=3\n    }\n    else if (flow.get(\"cambiarled4\")==1)\n    {\n        msg.payload.ledcambio=4\n    }\n    else if (flow.get(\"cambiarledT\")==1)\n    {\n        msg.payload.ledcambio=5\n    }\n    msg.payload.origin=\"Telegram\"\n    msg.payload.content=\"Se ha cambiado la intensidad del led a \"+valor;\n\n}\nelse if(valor<0 || valor>100)\n{\n msg.payload.content=\"Se necesita un valor entre 0 y 100 para cambiar la intensidad del led\";\n}\nelse if(msg.payload.content.substring(0,1)!=\"/\")\n{\n msg.payload.content=\"Hola \" +msg.originalMessage.from.first_name+  \", soy el bot del Grupo 12. Puedo responderte a estos comandos:\\n/start\\n/actuadores1  /actuadores2  /actuadores3  /actuadores4\\n/datos1  /datos2  /datos3  /datos4\\n/cambiarled1  /cambiarled2  /cambiarled3  /cambiarled4  /cambiarledT\\n/switch1  /switch2  /switch3  /switch4  /switchT\\n/riego1  /riego2  /riego3  /riego4  /riegoT\"\n var chatid=msg.originalMessage.chat.id\n global.set(\"chatid\",chatid)\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 140,
+        "wires": [
+            [
+                "8609b6333c022102",
+                "7783f5e49f105f1f",
+                "3d2881203a085116"
+            ]
+        ]
+    },
+    {
+        "id": "292443b8478cac1f",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar switches=msg.payload[0].SWITCH.toString()\nvar led=global.get(\"polaridad_PWM1\")\nvar riego=msg.payload[0].RIEGO.toString()\nvar valled=msg.payload[0].LED.toString()\nvar valsw=global.get(\"switchval1\")\nmsg.payload={}\nmsg.payload.content=\"Actuadores Placa 1 (\"+id+\"):\\nPolaridad LED: \"+led+\"\\nPWM LED: \"+valled+\"\\nPolaridad Switch: \"+switches+\"\\nValor Switch: \"+valsw+\"\\nRiego: \"+riego\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 240,
+        "wires": [
+            [
+                "82b8c9544fa632d6"
+            ]
+        ]
+    },
+    {
+        "id": "a2909e6d4ec32eb6",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar vcc=msg.payload[0].Vcc\nvar temp=msg.payload[0].DHT11.Temperatura\nvar hum=msg.payload[0].DHT11.Humedad\nvar uptime=msg.payload[0].Uptime\nvar rssi=msg.payload[0].Wifi.RSSI\nvar ssid=msg.payload[0].Wifi.SSID\nvar ip=msg.payload[0].Wifi.IP\n    \nmsg.payload={}\nmsg.payload.content=\"Datos Placa 1 (\"+id+\"):\\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 740,
+        "wires": [
+            [
+                "54fc4492e998b8ed"
+            ]
+        ]
+    },
+    {
+        "id": "ccbee3138fc50c23",
+        "type": "telegram receiver",
+        "z": "ed6565516a324783",
+        "name": "",
+        "bot": "b2cc055e98302147",
+        "saveDataDir": "",
+        "filterCommands": true,
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "43d5613c5437ba1c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "152ada58aa33b3e2",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/actuadores1",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 280,
+        "wires": [
+            [
+                "165a5d8f6b6fa83b"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d0a628ddf5a712bd",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/start",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 180,
+        "wires": [
+            [
+                "43d5613c5437ba1c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "8584b11b364188b6",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/datos1",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 780,
+        "wires": [
+            [
+                "b751541306d1856a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "affd43ec630ef326",
+        "type": "telegram sender",
+        "z": "ed6565516a324783",
+        "name": "",
+        "bot": "b2cc055e98302147",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b83bad69e79e442d",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/cambiarled1",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 1240,
+        "wires": [
+            [
+                "349f2a4646f76bda"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "349f2a4646f76bda",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID1\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 1 no conectada.\"\n}\nelse\n{\n    msg.payload.content=\"Cambia la intensidad del LED de la placa 1 entre 0 y 100.\" \n    flow.set(\"cambiarled1\",1)\n    flow.set(\"cambiarled2\",0)\n    flow.set(\"cambiarled3\",0)\n    flow.set(\"cambiarled4\",0)\n    flow.set(\"cambiarledT\",0)\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1240,
+        "wires": [
+            [
+                "ad567a20fb083bc9"
+            ]
+        ]
+    },
+    {
+        "id": "8609b6333c022102",
+        "type": "debug",
+        "z": "ed6565516a324783",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "46458dfd9124aab6",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/switch1",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1640,
+        "wires": [
+            [
+                "db5b29174c1d4556"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "db5b29174c1d4556",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID1\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 1 no conectada.\"\n}\nelse\n{\n    if (global.get(\"switchval1\")==1)\n    {\n        msg.payload.valor=0\n    }\n    else if (global.get(\"switchval1\")==0)\n    {\n        msg.payload.valor=1\n    }\n    msg.payload.content=\"Switch 1 cambiado\"\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1640,
+        "wires": [
+            [
+                "e047276e7a850c8b",
+                "89edaa314fcbc614"
+            ]
+        ]
+    },
+    {
+        "id": "b06627f08ce2e695",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/actuadores2",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 400,
+        "wires": [
+            [
+                "c891b8f8f36ccd5a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "58ae411563756369",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/actuadores3",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "d0cb39234a4d6ce7"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "68826388e6faf65a",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/actuadores4",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 640,
+        "wires": [
+            [
+                "62a53c7bdb76a800"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "165a5d8f6b6fa83b",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID1\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 1 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 280,
+        "wires": [
+            [
+                "a8cfad6a70aeec19"
+            ]
+        ]
+    },
+    {
+        "id": "a8cfad6a70aeec19",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 280,
+        "wires": [
+            [
+                "0835098b22b47ce6"
+            ],
+            [
+                "82b8c9544fa632d6"
+            ]
+        ]
+    },
+    {
+        "id": "0d26c368614c38cf",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar switches=msg.payload[0].SWITCH.toString()\nvar led=global.get(\"polaridad_PWM2\")\nvar riego=msg.payload[0].RIEGO.toString()\nvar valled=msg.payload[0].LED.toString()\nvar valsw=global.get(\"switchval2\")\nmsg.payload={}\nmsg.payload.content=\"Actuadores Placa 2 (\"+id+\"):\\nPolaridad LED: \"+led+\"\\nPWM LED: \"+valled+\"\\nPolaridad Switch: \"+switches+\"\\nValor Switch: \"+valsw+\"\\nRiego: \"+riego\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 360,
+        "wires": [
+            [
+                "fc342bdf6f3df1f8"
+            ]
+        ]
+    },
+    {
+        "id": "c891b8f8f36ccd5a",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID2\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 2 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 400,
+        "wires": [
+            [
+                "dde7b9f458a02780"
+            ]
+        ]
+    },
+    {
+        "id": "dde7b9f458a02780",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 400,
+        "wires": [
+            [
+                "dd7ffd72c53fe36c"
+            ],
+            [
+                "fc342bdf6f3df1f8"
+            ]
+        ]
+    },
+    {
+        "id": "d0cb39234a4d6ce7",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID3\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 3 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 520,
+        "wires": [
+            [
+                "68b53315ec35e33e"
+            ]
+        ]
+    },
+    {
+        "id": "0131fe9448b0aca9",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar switches=msg.payload[0].SWITCH.toString()\nvar led=global.get(\"polaridad_PWM4\")\nvar riego=msg.payload[0].RIEGO.toString()\nvar valled=msg.payload[0].LED.toString()\nvar valsw=global.get(\"switchval4\")\nmsg.payload={}\nmsg.payload.content=\"Actuadores Placa 4 (\"+id+\"):\\nPolaridad LED: \"+led+\"\\nPWM LED: \"+valled+\"\\nPolaridad Switch: \"+switches+\"\\nValor Switch: \"+valsw+\"\\nRiego: \"+riego\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 600,
+        "wires": [
+            [
+                "6fbf14f25d0b71be"
+            ]
+        ]
+    },
+    {
+        "id": "62a53c7bdb76a800",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID4\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 4 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "677ad657acf5b88e"
+            ]
+        ]
+    },
+    {
+        "id": "677ad657acf5b88e",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 640,
+        "wires": [
+            [
+                "04d681d2e842ceaf"
+            ],
+            [
+                "6fbf14f25d0b71be"
+            ]
+        ]
+    },
+    {
+        "id": "6fbf14f25d0b71be",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d",
+            "0d089421ec14787a"
+        ],
+        "x": 835,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "540d29a122958d9d",
+        "type": "link in",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "06e72eb5ff1e78ee",
+            "0849895995f0a782",
+            "1ce8b471fcf10ad9",
+            "36fabbaf0a68e6c9",
+            "39a1e27e6ec9995c",
+            "42bb737cbfd9a89e",
+            "455f803845d01863",
+            "54fc4492e998b8ed",
+            "6d6dcc85f00f2386",
+            "6fbf14f25d0b71be",
+            "6fff4cde0d7ff565",
+            "7783f5e49f105f1f",
+            "82b8c9544fa632d6",
+            "a8d43a1406d80965",
+            "aa88d776b9498bd2",
+            "ad567a20fb083bc9",
+            "b702b1e349f81ac4",
+            "c12d9e9a9fa4b8d0",
+            "c5b16b64609830f0",
+            "cd86ab5a91f43bcb",
+            "d1bc88799e2a0191",
+            "dfe428feb4bdd262",
+            "e047276e7a850c8b",
+            "f343b8f9d3169bcf",
+            "fc342bdf6f3df1f8",
+            "c24e178e864c8c54",
+            "b4e857e548d0938a"
+        ],
+        "x": 415,
+        "y": 60,
+        "wires": [
+            [
+                "affd43ec630ef326"
+            ]
+        ]
+    },
+    {
+        "id": "f3297553c37d25ab",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar switches=msg.payload[0].SWITCH.toString()\nvar led=global.get(\"polaridad_PWM3\")\nvar riego=msg.payload[0].RIEGO.toString()\nvar valled=msg.payload[0].LED.toString()\nvar valsw=global.get(\"switchval3\")\nmsg.payload={}\nmsg.payload.content=\"Actuadores Placa 3 (\"+id+\"):\\nPolaridad LED: \"+led+\"\\nPWM LED: \"+valled+\"\\nPolaridad Switch: \"+switches+\"\\nValor Switch: \"+valsw+\"\\nRiego: \"+riego\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 480,
+        "wires": [
+            [
+                "6fff4cde0d7ff565"
+            ]
+        ]
+    },
+    {
+        "id": "0835098b22b47ce6",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "292443b8478cac1f"
+            ]
+        ]
+    },
+    {
+        "id": "68b53315ec35e33e",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 520,
+        "wires": [
+            [
+                "1c7ee4d6afd8f657"
+            ],
+            [
+                "6fff4cde0d7ff565"
+            ]
+        ]
+    },
+    {
+        "id": "6fff4cde0d7ff565",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "f7ac813ff3f5d3d9",
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "fc342bdf6f3df1f8",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "5ea4cc9172474201",
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "82b8c9544fa632d6",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "c33ab59f0e97f8b3",
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "b751541306d1856a",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID1\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 1 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 780,
+        "wires": [
+            [
+                "ddb1b0c863e83af1"
+            ]
+        ]
+    },
+    {
+        "id": "ddb1b0c863e83af1",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 780,
+        "wires": [
+            [
+                "ed0589bbb0ae7b44"
+            ],
+            [
+                "54fc4492e998b8ed"
+            ]
+        ]
+    },
+    {
+        "id": "ed0589bbb0ae7b44",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 740,
+        "wires": [
+            [
+                "a2909e6d4ec32eb6",
+                "e1909beadfd92e4b"
+            ]
+        ]
+    },
+    {
+        "id": "dd7ffd72c53fe36c",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 360,
+        "wires": [
+            [
+                "0d26c368614c38cf"
+            ]
+        ]
+    },
+    {
+        "id": "1c7ee4d6afd8f657",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 480,
+        "wires": [
+            [
+                "f3297553c37d25ab"
+            ]
+        ]
+    },
+    {
+        "id": "04d681d2e842ceaf",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 600,
+        "wires": [
+            [
+                "0131fe9448b0aca9"
+            ]
+        ]
+    },
+    {
+        "id": "54fc4492e998b8ed",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "a4335eeb911b83cf",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar vcc=msg.payload[0].Vcc\nvar temp=msg.payload[0].DHT11.Temperatura\nvar hum=msg.payload[0].DHT11.Humedad\nvar uptime=msg.payload[0].Uptime\nvar rssi=msg.payload[0].Wifi.RSSI\nvar ssid=msg.payload[0].Wifi.SSID\nvar ip=msg.payload[0].Wifi.IP\n    \nmsg.payload={}\nmsg.payload.content=\"Datos Placa 2 (\"+id+\"):\\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 860,
+        "wires": [
+            [
+                "dfe428feb4bdd262"
+            ]
+        ]
+    },
+    {
+        "id": "8b79417d8a50ff06",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/datos2",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 900,
+        "wires": [
+            [
+                "b2b70fb146ef03f5"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b2b70fb146ef03f5",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID2\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 2 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 900,
+        "wires": [
+            [
+                "630c967b0bb65bcd"
+            ]
+        ]
+    },
+    {
+        "id": "630c967b0bb65bcd",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 900,
+        "wires": [
+            [
+                "66ef94cb6e495666"
+            ],
+            [
+                "dfe428feb4bdd262"
+            ]
+        ]
+    },
+    {
+        "id": "66ef94cb6e495666",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 860,
+        "wires": [
+            [
+                "a4335eeb911b83cf"
+            ]
+        ]
+    },
+    {
+        "id": "dfe428feb4bdd262",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "f2ce7141fc40430e",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar vcc=msg.payload[0].Vcc\nvar temp=msg.payload[0].DHT11.Temperatura\nvar hum=msg.payload[0].DHT11.Humedad\nvar uptime=msg.payload[0].Uptime\nvar rssi=msg.payload[0].Wifi.RSSI\nvar ssid=msg.payload[0].Wifi.SSID\nvar ip=msg.payload[0].Wifi.IP\n    \nmsg.payload={}\nmsg.payload.content=\"Datos Placa 3 (\"+id+\"):\\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 980,
+        "wires": [
+            [
+                "455f803845d01863"
+            ]
+        ]
+    },
+    {
+        "id": "bcd8f3d101c181c6",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/datos3",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1020,
+        "wires": [
+            [
+                "4076053872a7438c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4076053872a7438c",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID3\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 3 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1020,
+        "wires": [
+            [
+                "3c44d0a64c0b175a"
+            ]
+        ]
+    },
+    {
+        "id": "3c44d0a64c0b175a",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 1020,
+        "wires": [
+            [
+                "d60cc1bf6364bfc0"
+            ],
+            [
+                "455f803845d01863"
+            ]
+        ]
+    },
+    {
+        "id": "d60cc1bf6364bfc0",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 980,
+        "wires": [
+            [
+                "f2ce7141fc40430e"
+            ]
+        ]
+    },
+    {
+        "id": "455f803845d01863",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "7d6b1c79cb2e17bb",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var chatid=msg.originalMessage.chat.id\nvar id=msg.payload[0].CHIPID\nvar vcc=msg.payload[0].Vcc\nvar temp=msg.payload[0].DHT11.Temperatura\nvar hum=msg.payload[0].DHT11.Humedad\nvar uptime=msg.payload[0].Uptime\nvar rssi=msg.payload[0].Wifi.RSSI\nvar ssid=msg.payload[0].Wifi.SSID\nvar ip=msg.payload[0].Wifi.IP\n    \nmsg.payload={}\nmsg.payload.content=\"Datos Placa 4 (\"+id+\"):\\nVcc: \" +vcc+\"\\nTemperatura: \"+temp+\"\\nHumedad: \"+hum+\"\\nUptime: \"+uptime+\"\\nRSSI: \"+rssi+\"\\nSSID: \"+ssid+\"\\nLocal IP: \"+ip;\nmsg.payload.type=\"message\"\nmsg.payload.chatId=chatid\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 1100,
+        "wires": [
+            [
+                "f343b8f9d3169bcf"
+            ]
+        ]
+    },
+    {
+        "id": "93263656ff5969a1",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/datos4",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1140,
+        "wires": [
+            [
+                "7676667ca928f9c0"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7676667ca928f9c0",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID4\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 4 no conectada.\"\n    msg.correcto=0;\n}\nelse\n{\n    msg.limit=1;\n    msg.sort={\"date\":-1};\n    msg.payload={\"CHIPID\": id};\n    msg.correcto=1;\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1140,
+        "wires": [
+            [
+                "5d96d219826b1263"
+            ]
+        ]
+    },
+    {
+        "id": "5d96d219826b1263",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "correcto",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 1140,
+        "wires": [
+            [
+                "941d368ef852cd94"
+            ],
+            [
+                "f343b8f9d3169bcf"
+            ]
+        ]
+    },
+    {
+        "id": "941d368ef852cd94",
+        "type": "mongodb in",
+        "z": "ed6565516a324783",
+        "mongodb": "98277d641a9c0bb9",
+        "name": "",
+        "collection": "ProyectoGrupo12",
+        "operation": "find",
+        "x": 790,
+        "y": 1100,
+        "wires": [
+            [
+                "7d6b1c79cb2e17bb"
+            ]
+        ]
+    },
+    {
+        "id": "f343b8f9d3169bcf",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "c5c5ef76a491cf2a",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/cambiarled2",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 1320,
+        "wires": [
+            [
+                "f8b0806caf2ab533"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "f8b0806caf2ab533",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID2\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 2 no conectada.\"\n}\nelse\n{\n    msg.payload.content=\"Cambia la intensidad del LED de la placa 2 entre 0 y 100.\" \n    flow.set(\"cambiarled1\",0)\n    flow.set(\"cambiarled2\",1)\n    flow.set(\"cambiarled3\",0)\n    flow.set(\"cambiarled4\",0)\n    flow.set(\"cambiarledT\",0)\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1320,
+        "wires": [
+            [
+                "6d6dcc85f00f2386"
+            ]
+        ]
+    },
+    {
+        "id": "ad567a20fb083bc9",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "6d6dcc85f00f2386",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "3c313d5fbdb70ab3",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/cambiarled3",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 1400,
+        "wires": [
+            [
+                "cb87d9c877fc1286"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "cb87d9c877fc1286",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID3\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 3 no conectada.\"\n}\nelse\n{\n    msg.payload.content=\"Cambia la intensidad del LED de la placa 1 entre 0 y 100.\" \n    flow.set(\"cambiarled1\",0)\n    flow.set(\"cambiarled2\",0)\n    flow.set(\"cambiarled3\",1)\n    flow.set(\"cambiarled4\",0)\n    flow.set(\"cambiarledT\",0)\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1400,
+        "wires": [
+            [
+                "d1bc88799e2a0191"
+            ]
+        ]
+    },
+    {
+        "id": "48c2171d587696ac",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/cambiarled4",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 1480,
+        "wires": [
+            [
+                "635c41e2066f0f07"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "635c41e2066f0f07",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID4\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 4 no conectada.\"\n}\nelse\n{\n    msg.payload.content=\"Cambia la intensidad del LED de la placa 4 entre 0 y 100.\" \n    flow.set(\"cambiarled1\",0)\n    flow.set(\"cambiarled2\",0)\n    flow.set(\"cambiarled3\",0)\n    flow.set(\"cambiarled4\",1)\n    flow.set(\"cambiarledT\",0)\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1480,
+        "wires": [
+            [
+                "c5b16b64609830f0"
+            ]
+        ]
+    },
+    {
+        "id": "d1bc88799e2a0191",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "c5b16b64609830f0",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "7783f5e49f105f1f",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "c33ab59f0e97f8b3",
+            "540d29a122958d9d"
+        ],
+        "x": 835,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "e047276e7a850c8b",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "622ca7596936b4c3",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/switch2",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1720,
+        "wires": [
+            [
+                "c3baf5127a01d855"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c3baf5127a01d855",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID2\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 2 no conectada.\"\n}\nelse\n{\n    if (global.get(\"switchval2\")==1)\n    {\n        msg.payload.valor=0\n    }\n    else if (global.get(\"switchval2\")==0)\n    {\n        msg.payload.valor=1\n    }\n    msg.payload.content=\"Switch 2 cambiado\"\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1720,
+        "wires": [
+            [
+                "a8d43a1406d80965",
+                "a2e32fbb94227887"
+            ]
+        ]
+    },
+    {
+        "id": "a8d43a1406d80965",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "cdd104e2f9cebfd4",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/switch3",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1800,
+        "wires": [
+            [
+                "4c902394fbfd6fae"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4c902394fbfd6fae",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID3\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 3 no conectada.\"\n}\nelse\n{\n    if (global.get(\"switchval3\")==1)\n    {\n        msg.payload.valor=0\n    }\n    else if (global.get(\"switchval3\")==0)\n    {\n        msg.payload.valor=1\n    }\n    msg.payload.content=\"Switch 3 cambiado\"\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1800,
+        "wires": [
+            [
+                "c12d9e9a9fa4b8d0",
+                "fc0217ad9c2f338d"
+            ]
+        ]
+    },
+    {
+        "id": "c12d9e9a9fa4b8d0",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "85a666bace45cf29",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/switch4",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 1880,
+        "wires": [
+            [
+                "b05b2a432b6564f3"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b05b2a432b6564f3",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID4\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 4 no conectada.\"\n}\nelse\n{\n    if (global.get(\"switchval4\")==1)\n    {\n        msg.payload.valor=0\n    }\n    else if (global.get(\"switchval4\")==0)\n    {\n        msg.payload.valor=1\n    }\n    msg.payload.content=\"Switch 4 cambiado\"\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1880,
+        "wires": [
+            [
+                "42bb737cbfd9a89e",
+                "8ce815205982e912"
+            ]
+        ]
+    },
+    {
+        "id": "42bb737cbfd9a89e",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1880,
+        "wires": []
+    },
+    {
+        "id": "95b87ff4f775519c",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "825d813206f5b63e"
+        ],
+        "x": 1075,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "3d2881203a085116",
+        "type": "switch",
+        "z": "ed6565516a324783",
+        "name": "",
+        "property": "payload.ledcambio",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 180,
+        "wires": [
+            [
+                "95b87ff4f775519c"
+            ]
+        ]
+    },
+    {
+        "id": "57b94c9fea4a6b98",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/cambiarledT",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 1560,
+        "wires": [
+            [
+                "110565a9b008a3b1"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "110565a9b008a3b1",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "msg.payload.content=\"Cambia la intensidad de los LED de todas las placas entre 0 y 100.\" \nflow.set(\"cambiarled1\",0)\nflow.set(\"cambiarled2\",0)\nflow.set(\"cambiarled3\",0)\nflow.set(\"cambiarled4\",0)\nflow.set(\"cambiarledT\",1)\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1560,
+        "wires": [
+            [
+                "aa88d776b9498bd2"
+            ]
+        ]
+    },
+    {
+        "id": "aa88d776b9498bd2",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "ceda34ba6129e8c8",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "b123c8059abfc9db"
+        ],
+        "x": 695,
+        "y": 1680,
+        "wires": []
+    },
+    {
+        "id": "89edaa314fcbc614",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 1680,
+        "wires": [
+            [
+                "ceda34ba6129e8c8"
+            ]
+        ]
+    },
+    {
+        "id": "f78f62cc502dc1a7",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "48fc7cbdcd08ea59"
+        ],
+        "x": 695,
+        "y": 1760,
+        "wires": []
+    },
+    {
+        "id": "a2e32fbb94227887",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 1760,
+        "wires": [
+            [
+                "f78f62cc502dc1a7"
+            ]
+        ]
+    },
+    {
+        "id": "b8da518e7a8db48d",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "6398be45bcfde91d"
+        ],
+        "x": 695,
+        "y": 1840,
+        "wires": []
+    },
+    {
+        "id": "fc0217ad9c2f338d",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 1840,
+        "wires": [
+            [
+                "b8da518e7a8db48d"
+            ]
+        ]
+    },
+    {
+        "id": "8d927d61c7769b44",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "90c219aa61409ad2"
+        ],
+        "x": 695,
+        "y": 1920,
+        "wires": []
+    },
+    {
+        "id": "8ce815205982e912",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 1920,
+        "wires": [
+            [
+                "8d927d61c7769b44"
+            ]
+        ]
+    },
+    {
+        "id": "eafdc1f3ddb68b89",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/switchT",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 140,
+        "y": 1960,
+        "wires": [
+            [
+                "521baecda8063f13"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "521baecda8063f13",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "if (global.get(\"switchvalT\")==1)\n{\n    msg.payload.valor=0\n}\nelse if (global.get(\"switchvalT\")==0)\n{\n    msg.payload.valor=1\n}\n    msg.payload.content=\"Todos los switches cambiados\"\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1960,
+        "wires": [
+            [
+                "0849895995f0a782",
+                "75b3959d47be75bc"
+            ]
+        ]
+    },
+    {
+        "id": "0849895995f0a782",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 1960,
+        "wires": []
+    },
+    {
+        "id": "854050a84636bd16",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "ad067ce0d8760ded"
+        ],
+        "x": 695,
+        "y": 2000,
+        "wires": []
+    },
+    {
+        "id": "75b3959d47be75bc",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2000,
+        "wires": [
+            [
+                "854050a84636bd16"
+            ]
+        ]
+    },
+    {
+        "id": "c5b376de1fd0dce2",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/riego1",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 2060,
+        "wires": [
+            [
+                "01c10755bd52a43a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "01c10755bd52a43a",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID1\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 1 no conectada.\"\n}\nelse\n{\n    if (global.get(\"riego1\")==1)\n    {\n        msg.payload.valor=0\n        msg.payload.content=\"Riego 1 apagado\"\n    }\n    else if (global.get(\"riego1\")==0)\n    {\n        msg.payload.valor=1\n        msg.payload.content=\"Riego 1 encendido\"\n    }\n    \n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 2060,
+        "wires": [
+            [
+                "b702b1e349f81ac4",
+                "8b71c2b283d97b0c"
+            ]
+        ]
+    },
+    {
+        "id": "b702b1e349f81ac4",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "26fbdbd148157cfc",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/riego2",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 2140,
+        "wires": [
+            [
+                "35529c7dbd61fc5d"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "35529c7dbd61fc5d",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID2\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 2 no conectada.\"\n}\nelse\n{\n    if (global.get(\"riego2\")==1)\n    {\n        msg.payload.valor=0\n        msg.payload.content=\"Riego 2 apagado\"\n    }\n    else if (global.get(\"riego2\")==0)\n    {\n        msg.payload.valor=1\n        msg.payload.content=\"Riego 2 encendido\"\n    }\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 2140,
+        "wires": [
+            [
+                "06e72eb5ff1e78ee",
+                "7156db974e16747a"
+            ]
+        ]
+    },
+    {
+        "id": "06e72eb5ff1e78ee",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "ae2cc401142039cc",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/riego3",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 2220,
+        "wires": [
+            [
+                "6368b1f752dabefc"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6368b1f752dabefc",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID3\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 3 no conectada.\"\n}\nelse\n{\n    if (global.get(\"riego3\")==1)\n    {\n        msg.payload.valor=0\n        msg.payload.content=\"Riego 3 apagado\"\n    }\n    else if (global.get(\"riego3\")==0)\n    {\n        msg.payload.valor=1\n        msg.payload.content=\"Riego 3 encendido\"\n    }\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 2220,
+        "wires": [
+            [
+                "cd86ab5a91f43bcb",
+                "4113c3c40e22c059"
+            ]
+        ]
+    },
+    {
+        "id": "cd86ab5a91f43bcb",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 2220,
+        "wires": []
+    },
+    {
+        "id": "459cc97d406ad764",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/riego4",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 2300,
+        "wires": [
+            [
+                "e3be354e89521efa"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e3be354e89521efa",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "var id=global.get(\"ID4\")\nif (id==-1 || undefined)\n{\n    msg.payload.content=\"Placa 4 no conectada.\"\n}\nelse\n{\n    if (global.get(\"riego4\")==1)\n    {\n        msg.payload.valor=0\n        msg.payload.content=\"Riego 4 apagado\"\n    }\n    else if (global.get(\"riego4\")==0)\n    {\n        msg.payload.valor=1\n        msg.payload.content=\"Riego 4 encendido\"\n    }\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 2300,
+        "wires": [
+            [
+                "36fabbaf0a68e6c9",
+                "5706dfdc887ed6b0"
+            ]
+        ]
+    },
+    {
+        "id": "36fabbaf0a68e6c9",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 2300,
+        "wires": []
+    },
+    {
+        "id": "335449661264aa58",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "46d35474e56e21fe"
+        ],
+        "x": 695,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "8b71c2b283d97b0c",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2100,
+        "wires": [
+            [
+                "335449661264aa58"
+            ]
+        ]
+    },
+    {
+        "id": "b314d18c368efc49",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "8f33568e3ec8ac05"
+        ],
+        "x": 695,
+        "y": 2180,
+        "wires": []
+    },
+    {
+        "id": "7156db974e16747a",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2180,
+        "wires": [
+            [
+                "b314d18c368efc49"
+            ]
+        ]
+    },
+    {
+        "id": "13fb42f0f6c43073",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "e888f0240c3f732e"
+        ],
+        "x": 695,
+        "y": 2260,
+        "wires": []
+    },
+    {
+        "id": "4113c3c40e22c059",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2260,
+        "wires": [
+            [
+                "13fb42f0f6c43073"
+            ]
+        ]
+    },
+    {
+        "id": "a581df51973f4ac6",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "4da17f9cdae9fee6"
+        ],
+        "x": 695,
+        "y": 2340,
+        "wires": []
+    },
+    {
+        "id": "5706dfdc887ed6b0",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2340,
+        "wires": [
+            [
+                "a581df51973f4ac6"
+            ]
+        ]
+    },
+    {
+        "id": "11aff0ecd7bc6592",
+        "type": "telegram command",
+        "z": "ed6565516a324783",
+        "name": "",
+        "command": "/riegoT",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "b2cc055e98302147",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 2380,
+        "wires": [
+            [
+                "6cf0df723b557bef"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6cf0df723b557bef",
+        "type": "function",
+        "z": "ed6565516a324783",
+        "name": "mensaje respuesta",
+        "func": "if (global.get(\"riegoT\")==1)\n{\n    msg.payload.valor=0\n    msg.payload.content=\"Todos los riegos apagados\"\n}\nelse if (global.get(\"riegoT\")==0)\n{\n    msg.payload.valor=1\n    msg.payload.content=\"Todos los riegos encendidos\"\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 2380,
+        "wires": [
+            [
+                "1ce8b471fcf10ad9",
+                "dde9cecd9dcb5def"
+            ]
+        ]
+    },
+    {
+        "id": "1ce8b471fcf10ad9",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "540d29a122958d9d"
+        ],
+        "x": 535,
+        "y": 2380,
+        "wires": []
+    },
+    {
+        "id": "3377ef0f18e305d0",
+        "type": "link out",
+        "z": "ed6565516a324783",
+        "name": "",
+        "links": [
+            "d27ce4aa8b258006"
+        ],
+        "x": 695,
+        "y": 2420,
+        "wires": []
+    },
+    {
+        "id": "dde9cecd9dcb5def",
+        "type": "change",
+        "z": "ed6565516a324783",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.valor",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 2420,
+        "wires": [
+            [
+                "3377ef0f18e305d0"
+            ]
+        ]
+    },
+    {
+        "id": "e1909beadfd92e4b",
+        "type": "debug",
+        "z": "ed6565516a324783",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "b2cc055e98302147",
+        "type": "telegram bot",
+        "botname": "ProyectoGrupo12_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "98277d641a9c0bb9",
+        "type": "mongodb",
+        "hostname": "iot.ac.uma.es",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "II12",
+        "name": ""
+    }
+]
